@@ -68,7 +68,7 @@ const PluginInput = ({
 
   const property = {
     required,
-    name: label,
+    name: label.toLowerCase().replace(/\s/g, '-'),
   };
 
   return (

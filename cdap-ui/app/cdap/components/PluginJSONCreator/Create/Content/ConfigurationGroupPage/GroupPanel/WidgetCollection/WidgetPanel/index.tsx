@@ -52,7 +52,7 @@ export const WidgetPanelView = ({
   }
 
   return (
-    <div className={classes.eachWidgetContainer}>
+    <div className={classes.eachWidgetContainer} data-cy={`widget-panel-${widgetIndex}`}>
       <WidgetInfoInput widgetID={widgetID} />
       <WidgetActionButtons
         addWidgetToGroup={addWidgetToGroup}
@@ -68,6 +68,7 @@ export const WidgetPanelView = ({
         color="primary"
         component="span"
         onClick={openWidgetAttributes(widgetIndex)}
+        data-cy="open-widget-attributes"
       >
         Attributes
       </Button>

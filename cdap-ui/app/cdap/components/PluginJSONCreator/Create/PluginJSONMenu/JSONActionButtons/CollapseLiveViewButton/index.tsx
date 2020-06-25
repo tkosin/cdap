@@ -37,7 +37,7 @@ export const CollapseLiveViewButtonView = ({ classes, collapseLiveView }) => {
       }}
       title="Close JSON View"
     >
-      <Button onClick={collapseLiveView}>
+      <Button onClick={collapseLiveView} data-cy="collapse-live-view-button">
         <FullscreenExitIcon />
       </Button>
     </Tooltip>

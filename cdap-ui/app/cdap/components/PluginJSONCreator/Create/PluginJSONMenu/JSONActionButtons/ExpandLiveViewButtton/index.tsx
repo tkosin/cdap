@@ -32,12 +32,12 @@ const styles = (theme): StyleRules => {
 export const ExpandLiveViewButtonView = ({ classes, expandLiveView }) => {
   return (
     <Tooltip
-      title="Open JSON View"
+      title="Open Live View"
       classes={{
         tooltip: classes.buttonTooltip,
       }}
     >
-      <Button onClick={expandLiveView}>
+      <Button onClick={expandLiveView} data-cy="open-live-view-button">
         <CodeIcon />
       </Button>
     </Tooltip>

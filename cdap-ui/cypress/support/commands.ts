@@ -15,20 +15,9 @@
  */
 
 import { ConnectionType } from '../../app/cdap/components/DataPrepConnections/ConnectionType';
-import {
-  DEFAULT_GCP_PROJECTID,
-  DEFAULT_GCP_SERVICEACCOUNT_PATH,
-  RUNTIME_ARGS_DEPLOYED_SELECTOR,
-  RUNTIME_ARGS_KEY_SELECTOR,
-  RUNTIME_ARGS_VALUE_SELECTOR,
-} from '../support/constants';
-import { INodeIdentifier, INodeInfo, IgetNodeIDOptions } from '../typings';
-import {
-  getGenericEndpoint,
-  getConditionNodeEndpoint,
-  getNodeSelectorFromNodeIndentifier,
-  dataCy,
-} from '../helpers';
+import { dataCy, getConditionNodeEndpoint, getGenericEndpoint, getNodeSelectorFromNodeIndentifier } from '../helpers';
+import { DEFAULT_GCP_PROJECTID, DEFAULT_GCP_SERVICEACCOUNT_PATH, RUNTIME_ARGS_DEPLOYED_SELECTOR, RUNTIME_ARGS_KEY_SELECTOR, RUNTIME_ARGS_VALUE_SELECTOR } from '../support/constants';
+import { IgetNodeIDOptions, INodeIdentifier, INodeInfo } from '../typings';
 /**
  * Uploads a pipeline json from fixtures to input file element.
  *
@@ -660,3 +649,27 @@ Cypress.Commands.add(
     ).should('have.value', value);
   }
 );
+
+/**
+ * Uploads a plugin json from fixtures to input file element.
+ *
+ * @fileName - Name of the file from fixture folder including extension
+ * @selector - data-cy selector to query for the input[type="file"] element.
+ */
+Cypress.Commands.add('upload_plugin_json', (fileName, selector) => {
+  return cy.get(dataCy(selector), { timeout: 60000 }).then((subject) => {
+    return cy.fixture(fileName).then((pluginJSON) => {
+      const el = subject[0];
+      const blob = new Blob([JSON.stringify(pluginJSON, null, 2)], { type: 'application/json' });
+      return cy.window().then((win) => {
+        const testFile = new win.File([blob], fileName, {
+          type: 'application/json',
+        });
+        const dataTransfer = new win.DataTransfer();
+        dataTransfer.items.add(testFile);
+        el.files = dataTransfer.files;
+        return cy.wrap(subject).trigger('change', { force: true });
+      });
+    });
+  });
+});

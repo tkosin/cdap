@@ -122,7 +122,12 @@ const WidgetCollectionView: React.FC<IWidgetCollectionProps> = ({ classes, group
         <div className={classes.addWidgetLabel}>Add Widgets</div>
         <div className={classes.widgetContainer}>
           <If condition={activeWidgets.size === 0}>
-            <Button variant="contained" color="primary" onClick={addWidgetToGroup(0)}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={addWidgetToGroup(0)}
+              data-cy="add-properties-button"
+            >
               Add Properties
             </Button>
           </If>

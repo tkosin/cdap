@@ -53,7 +53,7 @@ const ExplicitSchemaDefinerView: React.FC<WithStyles<typeof styles>> = ({ classe
 
   return (
     <div>
-      <div className={classes.outputInput}>
+      <div className={classes.outputInput} data-cy="explicit-schema-definer">
         <PluginInput
           widgetType={'textbox'}
           value={outputName}

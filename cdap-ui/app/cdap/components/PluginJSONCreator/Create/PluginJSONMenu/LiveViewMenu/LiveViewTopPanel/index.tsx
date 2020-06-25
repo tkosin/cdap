@@ -72,7 +72,9 @@ const LiveViewTopPanelView: React.FC<ILiveViewTopPanelProps> = ({
       <JSONImportButton populateImportResults={populateImportResults} />
       <JSONDownloadButton downloadDisabled={downloadDisabled} onDownloadClick={onDownloadClick} />
 
-      <div className={classes.currentFilename}>{JSONFilename}</div>
+      <div className={classes.currentFilename} data-cy="plugin-json-filename">
+        {JSONFilename}
+      </div>
 
       <div className={classes.liveViewConfig}>
         <SwitchLiveViewModeButton liveViewMode={liveViewMode} setLiveViewMode={setLiveViewMode} />

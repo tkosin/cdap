@@ -88,6 +88,7 @@ const WidgetAttributesPanelView: React.FC<IWidgetAttributesPanelProps> = ({
       const localAttributeValues = localWidgetToAttributes.get(widgetID);
       setWidgetToAttributes(widgetToAttributes.set(widgetID, localAttributeValues));
       setLocalSaved(true);
+      closeWidgetAttributes();
     };
   }
 
@@ -101,9 +102,10 @@ const WidgetAttributesPanelView: React.FC<IWidgetAttributesPanelProps> = ({
           fullWidth={true}
           maxWidth={'md'}
           classes={{ paper: classes.attributeDialog }}
+          data-cy="widget-attributes-dialog"
         >
           <DialogTitle disableTypography className={classes.dialogTitle}>
-            <IconButton onClick={closeWidgetAttributes}>
+            <IconButton data-cy="close-widget-attributes" onClick={closeWidgetAttributes}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -117,24 +119,26 @@ const WidgetAttributesPanelView: React.FC<IWidgetAttributesPanelProps> = ({
                 <h2 className={classes.h2Title}>Configure Widget</h2>
               </div>
             </If>
-            {attributeFields.map((field, fieldIndex) => {
-              return (
-                <WidgetAttributeInput
-                  key={fieldIndex}
-                  widgetType={widgetType}
-                  field={field}
-                  widgetID={widgetID}
-                  localWidgetToAttributes={localWidgetToAttributes}
-                  setLocalWidgetToAttributes={setLocalWidgetToAttributes}
-                />
-              );
-            })}
-
+            <div data-cy="widget-attributes-inputs">
+              {attributeFields.map((field, fieldIndex) => {
+                return (
+                  <WidgetAttributeInput
+                    key={fieldIndex}
+                    widgetType={widgetType}
+                    field={field}
+                    widgetID={widgetID}
+                    localWidgetToAttributes={localWidgetToAttributes}
+                    setLocalWidgetToAttributes={setLocalWidgetToAttributes}
+                  />
+                );
+              })}
+            </div>
             <Button
               variant="contained"
               color="primary"
               disabled={localSaved}
               onClick={saveWidgetToAttributes()}
+              data-cy="save-widget-attributes"
             >
               Save
             </Button>

@@ -42,6 +42,7 @@ const styles = (theme): StyleRules => {
 };
 
 interface IFilterPanelProps extends WithStyles<typeof styles> {
+  filterIndex: number;
   filterID: string;
   addFilter: () => void;
   deleteFilter: () => void;
@@ -49,25 +50,26 @@ interface IFilterPanelProps extends WithStyles<typeof styles> {
 
 const FilterPanelView: React.FC<IFilterPanelProps> = ({
   classes,
+  filterIndex,
   filterID,
   addFilter,
   deleteFilter,
 }) => {
   return (
-    <div className={classes.filterContainer}>
-      <Button variant="contained" color="primary" onClick={addFilter}>
+    <div className={classes.filterContainer} data-cy={`filter-panel-${filterIndex}`}>
+      <Button variant="contained" color="primary" onClick={addFilter} data-cy="add-filter">
         Add Filter
       </Button>
-      <Button variant="contained" color="inherit" onClick={deleteFilter}>
+      <Button variant="contained" color="inherit" onClick={deleteFilter} data-cy="delete-filter">
         Delete Filter
       </Button>
       <div className={classes.filterInput}>
         <FilterNameInput filterID={filterID} />
       </div>
-      <div className={classes.filterInput}>
+      <div className={classes.filterInput} data-cy="filter-showlist-input">
         <FilterShowlistInput filterID={filterID} />
       </div>
-      <div className={classes.filterInput}>
+      <div className={classes.filterInput} data-cy="filter-condition-input">
         <FilterConditionInput filterID={filterID} />
       </div>
     </div>

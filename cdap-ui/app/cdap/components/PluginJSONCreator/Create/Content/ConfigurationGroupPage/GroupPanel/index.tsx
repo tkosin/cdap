@@ -44,6 +44,7 @@ const styles = (): StyleRules => {
 export const GroupPanelView = ({
   classes,
   groupID,
+  groupIndex,
   configurationGroupExpanded,
   switchEditConfigurationGroup,
   addConfigurationGroup,
@@ -53,8 +54,12 @@ export const GroupPanelView = ({
 
   const group = groupToInfo.get(groupID);
   return (
-    <div className={classes.eachGroup}>
-      <ExpansionPanel expanded={configurationGroupExpanded} onChange={switchEditConfigurationGroup}>
+    <div className={classes.eachGroup} data-cy={`configuration-group-panel-${groupIndex}`}>
+      <ExpansionPanel
+        expanded={configurationGroupExpanded}
+        onChange={switchEditConfigurationGroup}
+        data-cy={`open-configuration-group-panel-${groupIndex}`}
+      >
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
           <If condition={!configurationGroupExpanded}>
             <Typography className={classes.heading}>{group.get('label')}</Typography>

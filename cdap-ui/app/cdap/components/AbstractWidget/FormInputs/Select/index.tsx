@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import React from 'react';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import InputBase from '@material-ui/core/InputBase';
-import { IWidgetProps } from 'components/AbstractWidget';
-import { objectQuery } from 'services/helpers';
-import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import withStyles from '@material-ui/core/styles/withStyles';
+import { IWidgetProps } from 'components/AbstractWidget';
+import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import React from 'react';
+import { objectQuery } from 'services/helpers';
 
 const CustomizedInput = withStyles(() => {
   return {
@@ -73,9 +73,15 @@ const CustomSelect: React.FC<ISelectProps> = ({
       inputProps={{
         'data-cy': dataCy,
       }}
+      data-cy={`select-${dataCy}`}
     >
       {optionValues.map((opt) => (
-        <MenuItem value={opt.value} key={opt.value} disabled={opt.disabled}>
+        <MenuItem
+          value={opt.value}
+          key={opt.value}
+          disabled={opt.disabled}
+          data-cy={`option-${opt.value}`}
+        >
           {opt.label}
         </MenuItem>
       ))}

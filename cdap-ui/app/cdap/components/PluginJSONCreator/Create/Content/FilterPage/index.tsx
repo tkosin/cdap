@@ -95,7 +95,7 @@ const FilterPage = () => {
       <div>
         <Heading type={HeadingTypes.h3} label="Filters" />
         <If condition={filters.size === 0}>
-          <Button variant="contained" color="primary" onClick={addFilter(0)}>
+          <Button variant="contained" color="primary" onClick={addFilter(0)} data-cy="add-filter">
             Add Filters
           </Button>
         </If>
@@ -103,6 +103,7 @@ const FilterPage = () => {
         {filters.map((filterID: string, filterIndex: number) => {
           return (
             <FilterPanel
+              filterIndex={filterIndex}
               key={filterID}
               filterID={filterID}
               addFilter={addFilter(filterIndex)}

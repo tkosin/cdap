@@ -274,6 +274,7 @@ const PluginJSONMenuView: React.FC<WithStyles<typeof styles>> = ({ classes }) =>
         showAlert={JSONStatus === JSONStatusMessage.Fail}
         type="error"
         onClose={resetJSONStatus}
+        data-cy="json-error-message"
       />
     </div>
   );

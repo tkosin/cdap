@@ -65,9 +65,15 @@ const JSONImportButtonView: React.FC<IJSONImportButtonProps> = ({
         type="file"
         className={classes.fileInput}
         onChange={processFileUpload()}
+        data-cy="plugin-json-uploader"
       />
       <label htmlFor="raised-button-file">
-        <Button aria-label="save" component="span" color="primary">
+        <Button
+          aria-label="save"
+          component="span"
+          color="primary"
+          data-cy="plugin-json-import-button"
+        >
           <InsertDriveFileIcon />
         </Button>
       </label>
