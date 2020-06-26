@@ -14,41 +14,151 @@
  * the License.
  */
 
-import * as React from 'react';
-import { objectQuery } from 'services/helpers';
 import CodeEditorWidget from 'components/AbstractWidget/CodeEditorWidget';
+import JsonEditorWidget from 'components/AbstractWidget/CodeEditorWidget/JsonEditorWidget';
 import CSVWidget from 'components/AbstractWidget/CSVWidget';
 import DatasetSelector from 'components/AbstractWidget/DatasetSelectorWidget';
 import DateRangeWidget from 'components/AbstractWidget/DateRangeWidget';
 import DateTimeWidget from 'components/AbstractWidget/DateTimeWidget';
-import FunctionDropdownAliasWidget from 'components/AbstractWidget/FunctionDropdownAliasWidget';
 import DLPCustomWidget from 'components/AbstractWidget/DLPCustomWidget';
-import GetSchemaWidget from 'components/AbstractWidget/GetSchemaWidget';
-import InputFieldDropdown from 'components/AbstractWidget/InputFieldDropdown';
-import JoinTypeWidget from 'components/AbstractWidget/JoinTypeWidget';
-import JsonEditorWidget from 'components/AbstractWidget/CodeEditorWidget/JsonEditorWidget';
-import KeyValueDropdownWidget from 'components/AbstractWidget/KeyValueDropdownWidget';
-import KeyValueEncodedWidget from 'components/AbstractWidget/KeyValueWidget/KeyValueEncodedWidget';
-import KeyValueWidget from 'components/AbstractWidget/KeyValueWidget';
-import MemorySelectWidget from 'components/AbstractWidget/MemorySelectWidget';
-import MemoryTextbox from 'components/AbstractWidget/MemoryTextbox';
-import MultipleValuesWidget from 'components/AbstractWidget/MultipleValuesWidget';
 import MultiSelect from 'components/AbstractWidget/FormInputs/MultiSelect';
 import NumberWidget from 'components/AbstractWidget/FormInputs/Number';
 import PasswordWidget from 'components/AbstractWidget/FormInputs/Password';
-import PluginConnectionBrowser from 'components/DataPrepConnections/PluginConnectionBrowser';
+import Select from 'components/AbstractWidget/FormInputs/Select';
+import TextBox from 'components/AbstractWidget/FormInputs/TextBox';
+import FunctionDropdownAliasWidget from 'components/AbstractWidget/FunctionDropdownAliasWidget';
+import GetSchemaWidget from 'components/AbstractWidget/GetSchemaWidget';
+import InputFieldDropdown from 'components/AbstractWidget/InputFieldDropdown';
+import JoinTypeWidget from 'components/AbstractWidget/JoinTypeWidget';
+import KeyValueDropdownWidget from 'components/AbstractWidget/KeyValueDropdownWidget';
+import KeyValueWidget from 'components/AbstractWidget/KeyValueWidget';
+import KeyValueEncodedWidget from 'components/AbstractWidget/KeyValueWidget/KeyValueEncodedWidget';
+import MemorySelectWidget from 'components/AbstractWidget/MemorySelectWidget';
+import MemoryTextbox from 'components/AbstractWidget/MemoryTextbox';
+import MultipleValuesWidget from 'components/AbstractWidget/MultipleValuesWidget';
 import PluginListWidget from 'components/AbstractWidget/PluginListWidget';
 import RadioGroupWidget from 'components/AbstractWidget/RadioGroupWidget';
 import RulesEngineEditor from 'components/AbstractWidget/RulesEngineEditor';
 import SecureKeyPassword from 'components/AbstractWidget/SecureKey/SecureKeyPassword';
 import SecureKeyText from 'components/AbstractWidget/SecureKey/SecureKeyText';
 import SecureKeyTextarea from 'components/AbstractWidget/SecureKey/SecureKeyTextarea';
-import Select from 'components/AbstractWidget/FormInputs/Select';
 import SqlConditionsWidget from 'components/AbstractWidget/SqlConditionsWidget';
 import SqlSelectorWidget from 'components/AbstractWidget/SqlSelectorWidget';
-import TextBox from 'components/AbstractWidget/FormInputs/TextBox';
 import ToggleSwitchWidget from 'components/AbstractWidget/ToggleSwitchWidget';
 import WranglerEditor from 'components/AbstractWidget/WranglerEditor';
+import PluginConnectionBrowser from 'components/DataPrepConnections/PluginConnectionBrowser';
+import * as React from 'react';
+import { objectQuery } from 'services/helpers';
+
+export enum CodeEditorType {
+  Textarea = 'TEXTAREA',
+  Javascript = 'JAVASCRIPT',
+  JSON = 'JSON',
+  Python = 'PYTHON',
+  Scala = 'SCALA',
+  SQL = 'SQL',
+}
+
+function getCodeEditor(props, codeEditorType) {
+  let component;
+  switch (codeEditorType) {
+    case CodeEditorType.Textarea:
+      component = (
+        <CodeEditorWidget mode="plain_text" rows={getRowsFromWidgetProps(props)} {...props} />
+      );
+      break;
+    case CodeEditorType.Javascript:
+      component = <CodeEditorWidget mode="javascript" rows={25} {...props} />;
+      break;
+    case CodeEditorType.JSON:
+      component = <JsonEditorWidget rows={getRowsFromWidgetProps(props)} {...props} />;
+      break;
+    case CodeEditorType.Python:
+      component = <CodeEditorWidget mode="python" rows={25} {...props} />;
+      break;
+    case CodeEditorType.Scala:
+      component = <CodeEditorWidget mode="scala" rows={25} {...props} />;
+      break;
+    case CodeEditorType.SQL:
+      component = <CodeEditorWidget mode="sql" rows={15} {...props} />;
+      break;
+  }
+  (component as any).getWidgetAttributes = () => {
+    return {
+      default: { type: 'string', required: false },
+      rows: { type: 'number', required: false },
+    };
+  };
+  return component;
+}
+
+function Textarea(props) {
+  const rows = getRowsFromWidgetProps(props);
+  return <CodeEditorWidget mode="plain_text" rows={rows} {...props} />;
+}
+
+function JavascriptEditor(props) {
+  return <CodeEditorWidget mode="javascript" rows={25} {...props} />;
+}
+
+function JSONEditor(props) {
+  const rows = getRowsFromWidgetProps(props);
+  return <JsonEditorWidget rows={rows} {...props} />;
+}
+
+function PythonEditor(props) {
+  return <CodeEditorWidget mode="python" rows={25} {...props} />;
+}
+
+function ScalaEditor(props) {
+  return <CodeEditorWidget mode="scala" rows={25} {...props} />;
+}
+
+function SQLEditor(props) {
+  return <CodeEditorWidget mode="sql" rows={15} {...props} />;
+}
+
+(Textarea as any).getWidgetAttributes = () => {
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};
+
+(JavascriptEditor as any).getWidgetAttributes = () => {
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};
+
+(JSONEditor as any).getWidgetAttributes = () => {
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};
+
+(PythonEditor as any).getWidgetAttributes = () => {
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};
+
+(ScalaEditor as any).getWidgetAttributes = () => {
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};
+
+(SQLEditor as any).getWidgetAttributes = () => {
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};
 
 /**
  * Please maintain alphabetical order of the widget factory.
@@ -87,26 +197,12 @@ export const WIDGET_FACTORY = {
   toggle: ToggleSwitchWidget,
 
   // CODE EDITORS
-  'javascript-editor': (props) => {
-    return <CodeEditorWidget mode="javascript" rows={25} {...props} />;
-  },
-  'json-editor': (props) => {
-    const rows = getRowsFromWidgetProps(props);
-    return <JsonEditorWidget rows={rows} {...props} />;
-  },
-  'python-editor': (props) => {
-    return <CodeEditorWidget mode="python" rows={25} {...props} />;
-  },
-  'scala-editor': (props) => {
-    return <CodeEditorWidget mode="scala" rows={25} {...props} />;
-  },
-  'sql-editor': (props) => {
-    return <CodeEditorWidget mode="sql" rows={15} {...props} />;
-  },
-  textarea: (props) => {
-    const rows = getRowsFromWidgetProps(props);
-    return <CodeEditorWidget mode="plain_text" rows={rows} {...props} />;
-  },
+  'javascript-editor': JavascriptEditor,
+  'json-editor': JSONEditor,
+  'python-editor': PythonEditor,
+  'scala-editor': ScalaEditor,
+  'sql-editor': SQLEditor,
+  textarea: Textarea,
 
   // JOINS
   'join-types': JoinTypeWidget,

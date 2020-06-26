@@ -15,7 +15,7 @@
  */
 
 import withStyles, { StyleRules } from '@material-ui/core/styles/withStyles';
-import { WIDGET_TYPE_TO_ATTRIBUTES } from 'components/PluginJSONCreator/constants';
+import { WIDGET_FACTORY } from 'components/AbstractWidget/AbstractWidgetFactory';
 import MultipleAttributesInput from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetAttributesPanel/WidgetAttributeInput/MultipleAttributesInput';
 import SingleAttributeInput from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetAttributesPanel/WidgetAttributeInput/SingleAttributeInput';
 import * as React from 'react';
@@ -53,9 +53,26 @@ const WidgetAttributeInputView = ({
    * In this case, fieldInfo = { type: 'string', required: true }.
    * Therefore, we will render out the input that matches this requirement.
    */
-  const fieldInfo = WIDGET_TYPE_TO_ATTRIBUTES[widgetType]
-    ? WIDGET_TYPE_TO_ATTRIBUTES[widgetType][field]
-    : {};
+  let fieldInfo;
+  try {
+    const comp = WIDGET_FACTORY[widgetType];
+    if (widgetType === 'textarea') {
+      const widgetAttributes = comp.getWidgetAttributes();
+      debugger;
+    }
+    const widgetAttributes = comp.getWidgetAttributes();
+    fieldInfo = widgetAttributes[field];
+  } catch (e) {
+    fieldInfo = { type: 'string', required: false };
+    console.log('error with ', widgetType);
+  }
+  // const Comp2 = WIDGET_FACTORY[widgetType].getWidgetAttributes();
+  // fieldInfo = Comp.getWidgetAttributes()[field];
+  // else {
+  //   fieldInfo = WIDGET_TYPE_TO_ATTRIBUTES[widgetType]
+  //     ? WIDGET_TYPE_TO_ATTRIBUTES[widgetType][field]
+  //     : {};
+  // }
 
   const renderAttributeInput = () => {
     if (!fieldInfo) {

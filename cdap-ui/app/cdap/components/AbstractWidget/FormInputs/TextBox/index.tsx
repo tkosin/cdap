@@ -14,11 +14,11 @@
  * the License.
  */
 
-import React from 'react';
-import { objectQuery } from 'services/helpers';
+import InputBase from '@material-ui/core/InputBase';
 import { IWidgetProps } from 'components/AbstractWidget';
 import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
-import InputBase from '@material-ui/core/InputBase';
+import React from 'react';
+import { objectQuery } from 'services/helpers';
 
 interface ITextBoxWidgetProps {
   placeholder?: string;
@@ -51,3 +51,9 @@ const TextBox: React.FC<ITextBoxProps> = ({ value, onChange, widgetProps, disabl
 
 export default TextBox;
 (TextBox as any).propTypes = WIDGET_PROPTYPES;
+(TextBox as any).getWidgetAttributes = () => {
+  return {
+    placeholder: { type: 'string', required: false },
+    default: { type: 'string', required: false },
+  };
+};

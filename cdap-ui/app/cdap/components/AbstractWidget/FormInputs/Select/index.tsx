@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import React from 'react';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import InputBase from '@material-ui/core/InputBase';
-import { IWidgetProps } from 'components/AbstractWidget';
-import { objectQuery } from 'services/helpers';
-import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import withStyles from '@material-ui/core/styles/withStyles';
+import { IWidgetProps } from 'components/AbstractWidget';
+import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import React from 'react';
+import { objectQuery } from 'services/helpers';
 
 const CustomizedInput = withStyles(() => {
   return {
@@ -44,7 +44,11 @@ interface ISelectWidgetProps {
 
 interface ISelectProps extends IWidgetProps<ISelectWidgetProps> {}
 
-const CustomSelect: React.FC<ISelectProps> = ({
+interface IWidgetComponent {
+  getWidgetAttributes: () => Record<string, any>; // define in constants
+}
+
+const CustomSelect: React.FC<ISelectProps extends IWidgetComponent> = ({
   value,
   onChange,
   widgetProps,
@@ -84,5 +88,11 @@ const CustomSelect: React.FC<ISelectProps> = ({
 };
 
 (CustomSelect as any).propTypes = WIDGET_PROPTYPES;
+(CustomSelect as any).getWidgetAttributes = () => {
+  return {
+    options: { type: 'ISelectOptions[]|string[]|number[]', required: true },
+    default: { type: 'string', required: false },
+  };
+};
 
 export default CustomSelect;

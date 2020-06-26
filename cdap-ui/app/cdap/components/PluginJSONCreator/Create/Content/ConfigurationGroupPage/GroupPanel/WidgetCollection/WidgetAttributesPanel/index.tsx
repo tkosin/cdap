@@ -21,9 +21,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
 import CloseIcon from '@material-ui/icons/Close';
+import { WIDGET_FACTORY } from 'components/AbstractWidget/AbstractWidgetFactory';
 import If from 'components/If';
 import { h2Styles } from 'components/Markdown/MarkdownHeading';
-import { WIDGET_TYPE_TO_ATTRIBUTES } from 'components/PluginJSONCreator/constants';
 import { useWidgetState } from 'components/PluginJSONCreator/Create';
 import WidgetAttributeInput from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetAttributesPanel/WidgetAttributeInput';
 import WidgetInfoInput from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetPanel/WidgetInfoInput';
@@ -74,9 +74,25 @@ const WidgetAttributesPanelView: React.FC<IWidgetAttributesPanelProps> = ({
   // There are situations when the widgets from imported file do not include
   // all the required 'widget-atttributes'. Therefore, this approach will include
   // those missing fields.
-  const attributeFields = WIDGET_TYPE_TO_ATTRIBUTES[widgetType]
-    ? Object.keys(WIDGET_TYPE_TO_ATTRIBUTES[widgetType])
-    : [];
+  let attributeFields;
+  try {
+    const comp = WIDGET_FACTORY[widgetType];
+    if (widgetType === 'textarea') {
+      debugger;
+      const widgetAttributes = comp.getWidgetAttributes();
+      debugger;
+    }
+    const widgetAttributes = comp.getWidgetAttributes();
+    attributeFields = Object.keys(widgetAttributes);
+  } catch (e) {
+    attributeFields = [];
+    console.log('error with ', widgetType);
+  }
+  // else {
+  //   attributeFields = WIDGET_TYPE_TO_ATTRIBUTES[widgetType]
+  //     ? Object.keys(WIDGET_TYPE_TO_ATTRIBUTES[widgetType])
+  //     : [];
+  // }
 
   // When local changes to widget attributes happen
   React.useEffect(() => {

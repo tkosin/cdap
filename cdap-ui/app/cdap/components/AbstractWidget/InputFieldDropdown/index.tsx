@@ -13,11 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import React from 'react';
-import Select from 'components/AbstractWidget/FormInputs/Select';
-import { IWidgetProps, IStageSchema } from 'components/AbstractWidget';
-import { objectQuery } from 'services/helpers';
+import { IStageSchema, IWidgetProps } from 'components/AbstractWidget';
 import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import Select from 'components/AbstractWidget/FormInputs/Select';
+import React from 'react';
+import { objectQuery } from 'services/helpers';
 import MultiSelect from '../FormInputs/MultiSelect';
 
 interface IField {
@@ -149,3 +149,11 @@ const InputFieldDropdown: React.FC<IInputFieldProps> = ({
 export default InputFieldDropdown;
 
 (InputFieldDropdown as any).propTypes = WIDGET_PROPTYPES;
+
+(InputFieldDropdown as any).getWidgetAttributes = () => {
+  return {
+    // no attributes according to the docs
+    multiselect: { type: 'boolean', required: false },
+    allowedTypes: { type: 'string[]', required: false },
+  };
+};

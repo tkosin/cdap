@@ -14,13 +14,13 @@
  * the License.
  */
 
-import * as React from 'react';
-import withStyles, { WithStyles, StyleRules } from '@material-ui/core/styles/withStyles';
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
 import { IWidgetProps } from 'components/AbstractWidget';
-import CodeEditor from 'components/CodeEditor';
 import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
-import PropTypes from 'prop-types';
+import CodeEditor from 'components/CodeEditor';
 import ThemeWrapper from 'components/ThemeWrapper';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 const styles = (): StyleRules => {
   return {
@@ -72,10 +72,17 @@ function CodeEditorWidget(props) {
   );
 }
 
+export default CodeEditorWidget;
+
 (CodeEditorWidget as any).propTypes = {
   ...WIDGET_PROPTYPES,
   mode: PropTypes.string,
   rows: PropTypes.number,
 };
-
-export default CodeEditorWidget;
+(CodeEditorWidget as any).getWidgetAttributes = () => {
+  debugger;
+  return {
+    default: { type: 'string', required: false },
+    rows: { type: 'number', required: false },
+  };
+};

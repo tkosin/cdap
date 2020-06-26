@@ -14,15 +14,15 @@
  * the License.
  */
 
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import KeyValueRow from 'components/AbstractWidget/KeyValueWidget/KeyValueRow';
-import ThemeWrapper from 'components/ThemeWrapper';
 import AbstractMultiRowWidget, {
   IMultiRowProps,
 } from 'components/AbstractWidget/AbstractMultiRowWidget';
-import { objectQuery } from 'services/helpers';
 import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import KeyValueRow from 'components/AbstractWidget/KeyValueWidget/KeyValueRow';
+import ThemeWrapper from 'components/ThemeWrapper';
+import PropTypes from 'prop-types';
+import * as React from 'react';
+import { objectQuery } from 'services/helpers';
 
 interface IKeyValueWidgetProps {
   'key-placeholder'?: string;
@@ -75,4 +75,15 @@ export default function KeyValueWidget(props) {
 (KeyValueWidget as any).propTypes = {
   ...WIDGET_PROPTYPES,
   isEncoded: PropTypes.bool,
+};
+
+(KeyValueWidget as any).getWidgetAttributes = () => {
+  return {
+    'key-placeholder': { type: 'string', required: false },
+    'value-placeholder': { type: 'string', required: false },
+    'kv-delimiter': { type: 'string', required: false },
+    delimiter: { type: 'string', required: false },
+    // including additional property that was found from one of the json files
+    showDelimiter: { type: 'boolean', required: false },
+  };
 };

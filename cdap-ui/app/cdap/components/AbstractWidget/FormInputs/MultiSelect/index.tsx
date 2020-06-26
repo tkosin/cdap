@@ -112,3 +112,12 @@ export default function MultiSelect({
 }
 
 (MultiSelect as any).propTypes = WIDGET_PROPTYPES;
+(MultiSelect as any).getWidgetAttributes = () => {
+  return {
+    delimiter: { type: 'string', required: true },
+    options: { type: 'IOption[]', required: true },
+    showSelectionCount: { type: 'boolean', required: false },
+    // including additional property that was found from the docs
+    defaultValue: { type: 'string[]', required: false },
+  };
+};

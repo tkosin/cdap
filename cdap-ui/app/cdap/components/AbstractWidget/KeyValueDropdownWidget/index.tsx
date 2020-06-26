@@ -14,17 +14,17 @@
  * the License.
  */
 
-import * as React from 'react';
-import KeyValueDropdownRow, {
-  IDropdownOption,
-} from 'components/AbstractWidget/KeyValueDropdownWidget/KeyValueDropdownRow';
-import ThemeWrapper from 'components/ThemeWrapper';
 import AbstractMultiRowWidget, {
   IMultiRowProps,
   IMultiRowWidgetProps,
 } from 'components/AbstractWidget/AbstractMultiRowWidget';
-import { objectQuery } from 'services/helpers';
 import { WIDGET_PROPTYPES } from 'components/AbstractWidget/constants';
+import KeyValueDropdownRow, {
+  IDropdownOption,
+} from 'components/AbstractWidget/KeyValueDropdownWidget/KeyValueDropdownRow';
+import ThemeWrapper from 'components/ThemeWrapper';
+import * as React from 'react';
+import { objectQuery } from 'services/helpers';
 
 interface IKeyValueDropdownWidgetProps extends IMultiRowWidgetProps {
   'key-placeholder'?: string;
@@ -72,3 +72,11 @@ export default function KeyValueDropdownWidget(props) {
 }
 
 (KeyValueDropdownWidget as any).propTypes = WIDGET_PROPTYPES;
+(KeyValueDropdownWidget as any).getWidgetAttributes = () => {
+  return {
+    'key-placeholder': { type: 'string', required: false },
+    'kv-delimiter': { type: 'string', required: false },
+    dropdownOptions: { type: 'IDropdownOption[]', required: true },
+    delimiter: { type: 'string', required: false },
+  };
+};
