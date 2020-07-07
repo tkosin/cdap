@@ -73,7 +73,7 @@ const SecureKeyDelete: React.FC<ISecureKeyDeleteProps> = ({
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={deleteSecureKey} color="primary">
+          <Button onClick={deleteSecureKey} color="primary" data-cy="secure-key-delete-confirm">
             Delete
           </Button>
         </DialogActions>

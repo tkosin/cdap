@@ -103,7 +103,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
   return (
     <div>
       <h1 className={classes.secureKeysTitle}>
-        <IconButton onClick={handleBackButtonClick}>
+        <IconButton onClick={handleBackButtonClick} data-cy="back-button">
           <ArrowBackIcon />
         </IconButton>
         {keyMetadata.get('name')}
@@ -132,6 +132,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
                   </InputAdornment>
                 ),
               }}
+              data-cy="secure-key-description-view-only"
             />
           </FormControl>
 
@@ -142,7 +143,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
           >
             <TextField
               type={showData ? 'text' : 'password'}
-              value={'password'}
+              value={showData ? keyMetadata.get('data') : 'password'}
               variant="filled"
               color="primary"
               className={classes.secureKeyInput}
@@ -154,6 +155,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
                       aria-label="toggle password visibility"
                       onClick={() => setShowData(!showData)}
                       edge="end"
+                      data-cy="toggle-secure-data-visibility"
                     >
                       {showData ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
@@ -163,6 +165,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
                   </InputAdornment>
                 ),
               }}
+              data-cy="secure-key-data-view-only"
             />
           </FormControl>
 
@@ -172,6 +175,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
             color="primary"
             size="medium"
             onClick={() => setDeleteMode(true)}
+            data-cy="delete-secure-key"
           >
             Delete
           </Button>
@@ -181,6 +185,7 @@ const SecureKeysDetailsView: React.FC<ISecureKeysDetailsProps> = ({
             color="primary"
             size="medium"
             onClick={() => setEditMode(true)}
+            data-cy="edit-secure-key"
           >
             Edit
           </Button>

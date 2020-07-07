@@ -152,6 +152,7 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
             InputProps={{
               className: classes.textField,
             }}
+            data-cy="secure-key-description"
           />
         </div>
         <div className={classnames(classes.margin, classes.textField)}>
@@ -175,6 +176,7 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
                 </InputAdornment>
               ),
             }}
+            data-cy="secure-key-data"
           />
         </div>
         <div className={classnames(classes.margin, classes.keyvalueField)}>
@@ -196,6 +198,7 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
             }}
             value={localPropertiesInString}
             onChange={(keyvalue) => onLocalPropertiesChange(keyvalue)}
+            data-cy="secure-key-properties"
           />
         </div>
       </DialogContent>
@@ -203,7 +206,12 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
         <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={saveSecureKey} color="primary" disabled={!valueIsChanged}>
+        <Button
+          onClick={saveSecureKey}
+          color="primary"
+          disabled={!valueIsChanged}
+          data-cy="save-secure-key"
+        >
           Save
         </Button>
       </DialogActions>

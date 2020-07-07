@@ -101,7 +101,7 @@ const SecureKeyActionButtonsView: React.FC<ISecureKeyActionButtonsProps> = ({
         <IconButton onClick={handleMenuClick}>
           <MoreVertIcon />
         </IconButton>
-        <Menu anchorEl={menuEl} keepMounted open={Boolean(menuEl)} onClose={handleMenuClose}>
+        <Menu anchorEl={menuEl} open={Boolean(menuEl)} onClose={handleMenuClose}>
           <MenuItem onClick={(e) => onDetailsClick(e, keyIndex)}>Details</MenuItem>
           <MenuItem onClick={(e) => onDeleteClick(e, keyIndex)}>Delete</MenuItem>
         </Menu>

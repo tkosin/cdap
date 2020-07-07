@@ -129,8 +129,9 @@ const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
             color="primary"
             size="small"
             onClick={() => setCreateDialogOpen(true)}
+            data-cy="create-secure-key"
           >
-            Add Secure Key
+            Create Secure Key
           </Button>
         </div>
         <div className={classes.secureKeySearch}>
@@ -158,7 +159,7 @@ const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
                 <TableCell />
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody data-cy="secure-key-list">
               {secureKeys.map((keyMetadata, keyIndex) => {
                 const keyID = keyMetadata.get('name');
                 return (
@@ -168,6 +169,7 @@ const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
                     selected
                     className={classes.securityKeyRow}
                     onClick={onSecureKeyClick(keyIndex)}
+                    data-cy={`secure-key-row-${keyMetadata.get('name')}`}
                   >
                     <TableCell className={classes.nameCell}>{keyID}</TableCell>
                     <TableCell className={classes.descriptionCell}>

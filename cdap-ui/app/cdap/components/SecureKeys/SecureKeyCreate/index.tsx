@@ -143,6 +143,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
             InputProps={{
               className: classes.textField,
             }}
+            data-cy="secure-key-name"
           />
         </div>
         <div className={classnames(classes.margin, classes.textField)}>
@@ -154,6 +155,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
             InputProps={{
               className: classes.textField,
             }}
+            data-cy="secure-key-description"
           />
         </div>
         <div className={classnames(classes.margin, classes.textField)}>
@@ -177,6 +179,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
                 </InputAdornment>
               ),
             }}
+            data-cy="secure-key-data"
           />
         </div>
         <div className={classnames(classes.margin, classes.keyvalueField)}>
@@ -198,6 +201,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
             }}
             value={localPropertiesInString}
             onChange={(keyvalue) => onLocalPropertiesChange(keyvalue)}
+            data-cy="secure-key-properties"
           />
         </div>
       </DialogContent>
@@ -209,6 +213,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
           onClick={saveSecureKey}
           color="primary"
           disabled={!localName || !localDescription || !localData}
+          data-cy="save-secure-key"
         >
           Save
         </Button>
