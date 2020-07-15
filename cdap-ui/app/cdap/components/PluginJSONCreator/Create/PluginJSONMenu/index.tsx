@@ -14,12 +14,13 @@
  * the License.
  */
 
-import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import Alert from 'components/Alert';
-import If from 'components/If';
-import { JSONStatusMessage } from 'components/PluginJSONCreator/constants';
+import * as React from 'react';
+
+import {
+  downloadPluginJSON,
+  getJSONOutput,
+  parsePluginJSON,
+} from 'components/PluginJSONCreator/Create/PluginJSONMenu/utilities';
 import {
   useAppInternalState,
   useConfigurationGroupState,
@@ -28,14 +29,15 @@ import {
   usePluginInfoState,
   useWidgetState,
 } from 'components/PluginJSONCreator/Create';
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import Alert from 'components/Alert';
 import CollapsedMenu from 'components/PluginJSONCreator/Create/PluginJSONMenu/CollapsedMenu';
+import Drawer from '@material-ui/core/Drawer';
+import If from 'components/If';
+import { JSONStatusMessage } from 'components/PluginJSONCreator/constants';
+import List from '@material-ui/core/List';
 import LiveViewMenu from 'components/PluginJSONCreator/Create/PluginJSONMenu/LiveViewMenu';
-import {
-  downloadPluginJSON,
-  getJSONOutput,
-  parsePluginJSON,
-} from 'components/PluginJSONCreator/Create/PluginJSONMenu/utilities';
-import * as React from 'react';
 
 const LIVE_VIEWER_WIDTH = '600px';
 
@@ -274,7 +276,6 @@ const PluginJSONMenuView: React.FC<WithStyles<typeof styles>> = ({ classes }) =>
         showAlert={JSONStatus === JSONStatusMessage.Fail}
         type="error"
         onClose={resetJSONStatus}
-        data-cy="json-error-message"
       />
     </div>
   );

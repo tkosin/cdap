@@ -14,8 +14,9 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
 import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import Button from '@material-ui/core/Button';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import React from 'react';
 
@@ -68,12 +69,7 @@ const JSONImportButtonView: React.FC<IJSONImportButtonProps> = ({
         data-cy="plugin-json-uploader"
       />
       <label htmlFor="raised-button-file">
-        <Button
-          aria-label="save"
-          component="span"
-          color="primary"
-          data-cy="plugin-json-import-button"
-        >
+        <Button aria-label="save" component="span" color="primary" data-cy="plugin-json-import-btn">
           <InsertDriveFileIcon />
         </Button>
       </label>

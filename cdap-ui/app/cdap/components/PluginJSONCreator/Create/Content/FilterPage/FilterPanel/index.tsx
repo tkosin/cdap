@@ -14,12 +14,14 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import FilterNameInput from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel/FilerNameInput';
-import FilterConditionInput from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel/FilterConditionInput';
-import FilterShowlistInput from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel/FilterShowlistInput';
 import * as React from 'react';
+
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import Button from '@material-ui/core/Button';
+import FilterConditionInput from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel/FilterConditionInput';
+import FilterNameInput from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel/FilerNameInput';
+import FilterShowlistInput from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel/FilterShowlistInput';
 
 const styles = (theme): StyleRules => {
   return {
@@ -57,10 +59,15 @@ const FilterPanelView: React.FC<IFilterPanelProps> = ({
 }) => {
   return (
     <div className={classes.filterContainer} data-cy={`filter-panel-${filterIndex}`}>
-      <Button variant="contained" color="primary" onClick={addFilter} data-cy="add-filter">
+      <Button variant="contained" color="primary" onClick={addFilter} data-cy="add-filter-btn">
         Add Filter
       </Button>
-      <Button variant="contained" color="inherit" onClick={deleteFilter} data-cy="delete-filter">
+      <Button
+        variant="contained"
+        color="inherit"
+        onClick={deleteFilter}
+        data-cy="delete-filter-btn"
+      >
         Delete Filter
       </Button>
       <div className={classes.filterInput}>

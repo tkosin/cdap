@@ -14,11 +14,13 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import withStyles, { StyleRules } from '@material-ui/core/styles/withStyles';
-import Tooltip from '@material-ui/core/Tooltip';
-import CodeIcon from '@material-ui/icons/Code';
 import * as React from 'react';
+
+import withStyles, { StyleRules } from '@material-ui/core/styles/withStyles';
+
+import Button from '@material-ui/core/Button';
+import CodeIcon from '@material-ui/icons/Code';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = (theme): StyleRules => {
   return {
@@ -37,7 +39,7 @@ export const ExpandLiveViewButtonView = ({ classes, expandLiveView }) => {
         tooltip: classes.buttonTooltip,
       }}
     >
-      <Button onClick={expandLiveView} data-cy="open-live-view-button">
+      <Button onClick={expandLiveView} data-cy="open-live-view-btn">
         <CodeIcon />
       </Button>
     </Tooltip>

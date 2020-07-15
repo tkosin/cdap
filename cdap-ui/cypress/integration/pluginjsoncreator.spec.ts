@@ -296,7 +296,7 @@ describe('Plugin Information Page', () => {
         });
 
       // View live JSON output
-      cy.get(dataCy('open-live-view-button')).click();
+      cy.get(dataCy('open-live-view-btn')).click();
       // Check whether live JSON output now includes displayName.
       cy.get(dataCy('live-json')).contains(`"display-name": "${MOCK_PLUGIN_INFO.displayName}",`);
       // Check whether JSON filename is now ${pluginName}-${pluginType}.json.
@@ -306,20 +306,20 @@ describe('Plugin Information Page', () => {
 
       // Button that moves to the next page is now enabled,
       // since all the required fields are filled.
-      cy.get(dataCy('next-step-button')).should('not.be.disabled');
+      cy.get(dataCy('next-step-btn')).should('not.be.disabled');
 
       // Move to the next page
-      cy.get(dataCy('next-step-button')).click();
+      cy.get(dataCy('next-step-btn')).click();
     });
 
     it('should edit ConfigurationGroupsPage', () => {
-      cy.get(dataCy('collapse-live-view-button')).click({ force: true });
+      cy.get(dataCy('collapse-live-view-btn')).click({ force: true });
 
       MOCK_CONFIGURATION_GROUPS.forEach((group, groupIndex) => {
         const groupSelector = dataCy(`configuration-group-panel-${groupIndex}`);
 
         // Add a new configuration group
-        cy.get(dataCy('add-configuration-group')).click();
+        cy.get(dataCy('add-configuration-group-btn')).click();
         cy.get(groupSelector).should('exist');
 
         // Edit configuration group label
@@ -332,10 +332,10 @@ describe('Plugin Information Page', () => {
           // Add a new widget under the new configuration group
           const widgetSelector = dataCy(`widget-panel-${widgetIndex}`);
           if (widgetIndex === 0) {
-            cy.get(dataCy('add-properties-button')).click(); // this adds the first widget
+            cy.get(dataCy('add-properties-btn')).click(); // this adds the first widget
           } else {
             const previousWidgetSelector = dataCy(`widget-panel-${widgetIndex - 1}`);
-            cy.get(`${previousWidgetSelector} ${dataCy('add-widget-icon')}`).click(); // this adds another widget
+            cy.get(`${previousWidgetSelector} ${dataCy('add-widget-btn')}`).click(); // this adds another widget
           }
 
           // Edit a basic information of the existing widget
@@ -392,13 +392,13 @@ describe('Plugin Information Page', () => {
 
           // Save the widget attributes
           cy.get(
-            `${dataCy('widget-attributes-dialog')} ${dataCy('save-widget-attributes')}`
+            `${dataCy('widget-attributes-dialog')} ${dataCy('save-widget-attributes-btn')}`
           ).click();
         });
       });
 
       // View live JSON output
-      cy.get(dataCy('open-live-view-button')).click({ force: true });
+      cy.get(dataCy('open-live-view-btn')).click();
 
       // Compare the live JSON code with our mock data
       cy.get(dataCy('live-json')).should((jsonContent) => {
@@ -409,11 +409,11 @@ describe('Plugin Information Page', () => {
       });
 
       // Move to the next page
-      cy.get(dataCy('next-step-button')).click();
+      cy.get(dataCy('next-step-btn')).click();
     });
 
     it('should edit OutputPage', () => {
-      cy.get(dataCy('collapse-live-view-button')).click({ force: true });
+      cy.get(dataCy('collapse-live-view-btn')).click({ force: true });
 
       // Switch to explicit output schema
       cy.get('[type="radio"]')
@@ -441,7 +441,7 @@ describe('Plugin Information Page', () => {
       cy.get(dataCy(`option-${newSchemaDefaultType}`)).click();
 
       // View live JSON output
-      cy.get(dataCy('open-live-view-button')).click({ force: true });
+      cy.get(dataCy('open-live-view-btn')).click();
 
       // Compare the live JSON code with our mock data
       cy.get(dataCy('live-json')).should((jsonContent) => {
@@ -468,7 +468,7 @@ describe('Plugin Information Page', () => {
       });
 
       // Save schema
-      cy.get(dataCy('save-schema-button')).click();
+      cy.get(dataCy('save-schema-btn')).click();
 
       // Compare the live JSON code with our mock data
       cy.get(dataCy('live-json')).should((jsonContent) => {
@@ -479,20 +479,20 @@ describe('Plugin Information Page', () => {
       });
 
       // Move to the next page
-      cy.get(dataCy('next-step-button')).click();
+      cy.get(dataCy('next-step-btn')).click();
     });
 
     it('should edit FilterPage', () => {
-      cy.get(dataCy('collapse-live-view-button')).click({ force: true });
+      cy.get(dataCy('collapse-live-view-btn')).click({ force: true });
 
       MOCK_FILTERS.forEach((filter, filterIndex) => {
         // Add a new filter
         const filterSelector = dataCy(`filter-panel-${filterIndex}`);
         if (filterIndex === 0) {
-          cy.get(dataCy('add-filter')).click(); // this adds the first filter
+          cy.get(dataCy('add-filter-btn')).click(); // this adds the first filter
         } else {
           const previousFilterSelector = dataCy(`filter-panel-${filterIndex - 1}`);
-          cy.get(`${previousFilterSelector} ${dataCy('add-filter')}`).click(); // this adds another filter
+          cy.get(`${previousFilterSelector} ${dataCy('add-filter-btn')}`).click(); // this adds another filter
         }
         cy.get(filterSelector).should('exist');
 
@@ -584,7 +584,7 @@ describe('Plugin Information Page', () => {
       });
 
       // View live JSON output
-      cy.get(dataCy('open-live-view-button')).click({ force: true });
+      cy.get(dataCy('open-live-view-btn')).click();
 
       // Compare the live JSON code with our mock data
       cy.get(dataCy('live-json')).should((jsonContent) => {
@@ -601,16 +601,28 @@ describe('Plugin Information Page', () => {
       cy.visit('/cdap/ns/default/plugincreation');
     });
 
+    it('throw valid error when trying to upload invalid files', () => {
+      const filename = 'invalid-plugin.2json';
+      const fileUploader = 'plugin-json-uploader';
+
+      cy.get(dataCy('plugin-json-import-btn')).click();
+
+      cy.upload_plugin_json(filename, fileUploader);
+      cy.contains('SyntaxError');
+    });
+
     it('should populate the imported results for HTTP-batchsource.json', () => {
       const filename = 'HTTP-batchsource.json';
-      const fileNameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
-      const [pluginName, pluginType] = fileNameWithoutExtension.split('-');
-      cy.get(dataCy('plugin-json-import-button')).click();
-      cy.upload_plugin_json(filename, 'plugin-json-uploader');
-      cy.wait(1000);
+      const fileUploader = 'plugin-json-uploader';
+      const filenameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+      const [pluginName, pluginType] = filenameWithoutExtension.split('-');
+
+      cy.get(dataCy('plugin-json-import-btn')).click();
+
+      cy.upload_plugin_json(filename, fileUploader);
 
       cy.fixture(filename).then((data) => {
-        cy.get(dataCy('open-live-view-button')).click();
+        cy.get(dataCy('open-live-view-btn')).click({ force: true });
 
         // Plugin Information page has been populated with import results.
         cy.get(dataCy('plugin-json-filename')).contains(`${pluginName}-${pluginType}.json`);
@@ -628,15 +640,15 @@ describe('Plugin Information Page', () => {
         }
 
         // Configuration Group page has been populated with import results.
-        cy.get(dataCy('next-step-button')).click();
+        cy.get(dataCy('next-step-btn')).click();
         checkImportedConfigurationGroups(data['configuration-groups']);
 
         // Output page has been populated with import results.
-        cy.get(dataCy('next-step-button')).click();
+        cy.get(dataCy('next-step-btn')).click();
         checkImportedOutputs(data.outputs[0]);
 
         // Filters page has been populated with import results.
-        cy.get(dataCy('next-step-button')).click();
+        cy.get(dataCy('next-step-btn')).click();
         checkImportedFilters(data.filters);
 
         // Compare the live JSON code with our mock data

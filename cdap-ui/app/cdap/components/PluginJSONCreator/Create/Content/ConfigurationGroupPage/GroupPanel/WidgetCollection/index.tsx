@@ -14,14 +14,16 @@
  * the License.
  */
 
+import * as React from 'react';
+
+import { List, Map } from 'immutable';
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
 import If from 'components/If';
-import { useWidgetState } from 'components/PluginJSONCreator/Create';
 import WidgetPanel from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetPanel';
-import { List, Map } from 'immutable';
-import * as React from 'react';
+import { useWidgetState } from 'components/PluginJSONCreator/Create';
 import uuidV4 from 'uuid/v4';
 
 const styles = (theme): StyleRules => {
@@ -126,7 +128,7 @@ const WidgetCollectionView: React.FC<IWidgetCollectionProps> = ({ classes, group
               variant="contained"
               color="primary"
               onClick={addWidgetToGroup(0)}
-              data-cy="add-properties-button"
+              data-cy="add-properties-btn"
             >
               Add Properties
             </Button>

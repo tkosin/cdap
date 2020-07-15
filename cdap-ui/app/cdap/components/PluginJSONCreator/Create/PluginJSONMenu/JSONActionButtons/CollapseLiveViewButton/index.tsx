@@ -14,11 +14,13 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import withStyles, { StyleRules } from '@material-ui/core/styles/withStyles';
-import Tooltip from '@material-ui/core/Tooltip';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import * as React from 'react';
+
+import withStyles, { StyleRules } from '@material-ui/core/styles/withStyles';
+
+import Button from '@material-ui/core/Button';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = (theme): StyleRules => {
   return {
@@ -37,7 +39,7 @@ export const CollapseLiveViewButtonView = ({ classes, collapseLiveView }) => {
       }}
       title="Close JSON View"
     >
-      <Button onClick={collapseLiveView} data-cy="collapse-live-view-button">
+      <Button onClick={collapseLiveView} data-cy="collapse-live-view-btn">
         <FullscreenExitIcon />
       </Button>
     </Tooltip>

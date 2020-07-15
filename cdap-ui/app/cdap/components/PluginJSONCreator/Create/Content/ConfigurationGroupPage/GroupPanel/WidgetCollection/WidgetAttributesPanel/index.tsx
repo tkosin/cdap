@@ -14,20 +14,22 @@
  * the License.
  */
 
+import * as React from 'react';
+
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
 import Button from '@material-ui/core/Button';
+import CloseIcon from '@material-ui/icons/Close';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import CloseIcon from '@material-ui/icons/Close';
 import If from 'components/If';
-import { h2Styles } from 'components/Markdown/MarkdownHeading';
 import { WIDGET_TYPE_TO_ATTRIBUTES } from 'components/PluginJSONCreator/constants';
-import { useWidgetState } from 'components/PluginJSONCreator/Create';
 import WidgetAttributeInput from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetAttributesPanel/WidgetAttributeInput';
 import WidgetInfoInput from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel/WidgetCollection/WidgetPanel/WidgetInfoInput';
-import * as React from 'react';
+import { h2Styles } from 'components/Markdown/MarkdownHeading';
+import { useWidgetState } from 'components/PluginJSONCreator/Create';
 
 const styles = (theme): StyleRules => {
   return {
@@ -105,7 +107,7 @@ const WidgetAttributesPanelView: React.FC<IWidgetAttributesPanelProps> = ({
           data-cy="widget-attributes-dialog"
         >
           <DialogTitle disableTypography className={classes.dialogTitle}>
-            <IconButton data-cy="close-widget-attributes" onClick={closeWidgetAttributes}>
+            <IconButton data-cy="close-widget-attributes-btn" onClick={closeWidgetAttributes}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -138,7 +140,7 @@ const WidgetAttributesPanelView: React.FC<IWidgetAttributesPanelProps> = ({
               color="primary"
               disabled={localSaved}
               onClick={saveWidgetToAttributes()}
-              data-cy="save-widget-attributes"
+              data-cy="save-widget-attributes-btn"
             >
               Save
             </Button>

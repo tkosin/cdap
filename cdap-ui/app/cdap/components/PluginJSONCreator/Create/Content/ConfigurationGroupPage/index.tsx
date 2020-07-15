@@ -14,14 +14,16 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import Heading, { HeadingTypes } from 'components/Heading';
-import If from 'components/If';
-import { useConfigurationGroupState, useWidgetState } from 'components/PluginJSONCreator/Create';
-import GroupPanel from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel';
-import StepButtons from 'components/PluginJSONCreator/Create/Content/StepButtons';
-import { List, Map } from 'immutable';
 import * as React from 'react';
+
+import Heading, { HeadingTypes } from 'components/Heading';
+import { List, Map } from 'immutable';
+import { useConfigurationGroupState, useWidgetState } from 'components/PluginJSONCreator/Create';
+
+import Button from '@material-ui/core/Button';
+import GroupPanel from 'components/PluginJSONCreator/Create/Content/ConfigurationGroupPage/GroupPanel';
+import If from 'components/If';
+import StepButtons from 'components/PluginJSONCreator/Create/Content/StepButtons';
 import uuidV4 from 'uuid/v4';
 
 const ConfigurationGroupPage = () => {
@@ -124,7 +126,7 @@ const ConfigurationGroupPage = () => {
             variant="contained"
             color="primary"
             onClick={addConfigurationGroup(0)}
-            data-cy="add-configuration-group"
+            data-cy="add-configuration-group-btn"
           >
             Add Configuration Group
           </Button>

@@ -14,14 +14,16 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import Heading, { HeadingTypes } from 'components/Heading';
-import If from 'components/If';
-import { useFilterState } from 'components/PluginJSONCreator/Create';
-import FilterPanel from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel';
-import StepButtons from 'components/PluginJSONCreator/Create/Content/StepButtons';
-import { List, Map } from 'immutable';
 import * as React from 'react';
+
+import Heading, { HeadingTypes } from 'components/Heading';
+import { List, Map } from 'immutable';
+
+import Button from '@material-ui/core/Button';
+import FilterPanel from 'components/PluginJSONCreator/Create/Content/FilterPage/FilterPanel';
+import If from 'components/If';
+import StepButtons from 'components/PluginJSONCreator/Create/Content/StepButtons';
+import { useFilterState } from 'components/PluginJSONCreator/Create';
 import uuidV4 from 'uuid/v4';
 
 const FilterPage = () => {
@@ -95,7 +97,12 @@ const FilterPage = () => {
       <div>
         <Heading type={HeadingTypes.h3} label="Filters" />
         <If condition={filters.size === 0}>
-          <Button variant="contained" color="primary" onClick={addFilter(0)} data-cy="add-filter">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={addFilter(0)}
+            data-cy="add-filter-btn"
+          >
             Add Filters
           </Button>
         </If>

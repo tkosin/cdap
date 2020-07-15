@@ -14,12 +14,14 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import If from 'components/If';
-import { useAppInternalState } from 'components/PluginJSONCreator/Create';
-import { STEPS } from 'components/PluginJSONCreator/Create/Content';
 import * as React from 'react';
+
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import Button from '@material-ui/core/Button';
+import If from 'components/If';
+import { STEPS } from 'components/PluginJSONCreator/Create/Content';
+import { useAppInternalState } from 'components/PluginJSONCreator/Create';
 
 const styles = (theme): StyleRules => {
   return {
@@ -77,7 +79,7 @@ const StepButtonsView: React.FC<IStepButtonProps> = ({
   return (
     <div className={classes.root}>
       <If condition={activeStep > 0}>
-        <Button color="primary" onClick={handlePreviousClick} data-cy="previous-step-button">
+        <Button color="primary" onClick={handlePreviousClick} data-cy="previous-step-btn">
           Previous
         </Button>
       </If>
@@ -87,7 +89,7 @@ const StepButtonsView: React.FC<IStepButtonProps> = ({
           color="primary"
           onClick={handleNextClick}
           disabled={nextDisabled}
-          data-cy="next-step-button"
+          data-cy="next-step-btn"
         >
           Next
         </Button>

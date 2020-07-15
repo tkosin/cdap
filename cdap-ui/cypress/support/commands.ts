@@ -14,10 +14,12 @@
  * the License.
  */
 
-import { ConnectionType } from '../../app/cdap/components/DataPrepConnections/ConnectionType';
-import { dataCy, getConditionNodeEndpoint, getGenericEndpoint, getNodeSelectorFromNodeIndentifier } from '../helpers';
 import { DEFAULT_GCP_PROJECTID, DEFAULT_GCP_SERVICEACCOUNT_PATH, RUNTIME_ARGS_DEPLOYED_SELECTOR, RUNTIME_ARGS_KEY_SELECTOR, RUNTIME_ARGS_VALUE_SELECTOR } from '../support/constants';
-import { IgetNodeIDOptions, INodeIdentifier, INodeInfo } from '../typings';
+import { INodeIdentifier, INodeInfo, IgetNodeIDOptions } from '../typings';
+import { dataCy, getConditionNodeEndpoint, getGenericEndpoint, getNodeSelectorFromNodeIndentifier } from '../helpers';
+
+import { ConnectionType } from '../../app/cdap/components/DataPrepConnections/ConnectionType';
+
 /**
  * Uploads a pipeline json from fixtures to input file element.
  *
@@ -660,7 +662,9 @@ Cypress.Commands.add('upload_plugin_json', (fileName, selector) => {
   return cy.get(dataCy(selector), { timeout: 60000 }).then((subject) => {
     return cy.fixture(fileName).then((pluginJSON) => {
       const el = subject[0];
-      const blob = new Blob([JSON.stringify(pluginJSON, null, 2)], { type: 'application/json' });
+      const JSONContent =
+        typeof pluginJSON === 'string' ? pluginJSON : JSON.stringify(pluginJSON, undefined, 2);
+      const blob = new Blob([JSONContent], { type: 'application/json' });
       return cy.window().then((win) => {
         const testFile = new win.File([blob], fileName, {
           type: 'application/json',
