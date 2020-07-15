@@ -215,6 +215,7 @@ public final class Constants {
 
     public static final String PROGRAM_TRANSACTION_CONTROL = "app.program.transaction.control";
     public static final String MAX_CONCURRENT_RUNS = "app.max.concurrent.runs";
+    public static final String PROGRAM_LAUNCH_THREADS = "app.program.launch.threads";
 
     // A boolean value cConf entry to tell whether a ProgramRunner is running remotely (i.e. not inside app-fabric)
     // This config is not present in the cdap-default.xml as it is only set internally by CDAP.
@@ -348,7 +349,9 @@ public final class Constants {
     public static final String BOSS_THREADS = "preview.boss.threads";
     public static final String WORKER_THREADS = "preview.worker.threads";
 
-    public static final String PREVIEW_CACHE_SIZE = "preview.cache.size";
+    public static final String CACHE_SIZE = "preview.cache.size";
+    public static final String REQUEST_POLL_DELAY_MILLIS = "preview.request.poll.delay.millis";
+    public static final String MAX_RUNS = "preview.max.runs";
   }
 
   /**
@@ -638,6 +641,7 @@ public final class Constants {
     public static final String TWILL_INSTANCE_ID = "metrics.twill.instance.id";
 
     public static final String METRICS_WRITER_EXTENSIONS_DIR = "metrics.writer.extensions.dir";
+    public static final String METRICS_WRITER_PREFIX = "metrics.writer.";
 
     public static final Map<String, String> METRICS_PROCESSOR_CONTEXT =
       ImmutableMap.of(Constants.Metrics.Tag.NAMESPACE, NamespaceId.SYSTEM.getNamespace(),
