@@ -28,6 +28,7 @@ import ToggleExperiment from 'components/Lab/ToggleExperiment';
 import VirtualScrollDemo from 'components/VirtualScroll/demo';
 import globalEvents from 'services/global-events';
 import ee from 'event-emitter';
+import { GLOBALS } from 'services/global-constants';
 require('./Home.scss');
 
 import Playground from 'components/LogViewer/Playground';
@@ -142,7 +143,7 @@ export default class Home extends Component {
         if (!isValid) {
           this.eventEmitter.emit(globalEvents.PAGE_LEVEL_ERROR, {
             statusCode: 404,
-            data: `'namespace:${namespace}' was not found.`,
+            data: GLOBALS.pageLevelErrors['INVALID-NAMESPACE'](namespace),
           });
         }
       })
