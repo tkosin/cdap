@@ -133,7 +133,14 @@ class MyAppHeader extends React.PureComponent<IMyAppHeaderProps, IMyAppHeaderSta
       !this.state.currentNamespace ||
       (typeof this.state.currentNamespace === 'string' && !this.state.currentNamespace.length)
     ) {
-      return <LoadingSVGCentered showFullPage />;
+      return (
+        <React.Fragment>
+          <LoadingSVGCentered showFullPage />
+          <ExperimentalFeature id="system-delay-notification">
+            <SystemServicesDelay />
+          </ExperimentalFeature>
+        </React.Fragment>
+      );
     }
     return (
       <AppBar
