@@ -14,17 +14,10 @@
  * the License.
  */
 
-import * as React from 'react';
-import If from 'components/If';
-
-interface IExperimentWrapperProps {
-  children: React.ReactNode;
-  id: string;
-}
-
-const ExperimentWrapper: React.FC<IExperimentWrapperProps> = ({ children, id }) => {
-  const featureAvailable = window.localStorage.getItem(id) === 'true';
-  return <If condition={featureAvailable}>{children}</If>;
+const SystemDelayActions = {
+  registerDataSource: 'REGISTER_DATASOURCE',
+  showDelay: 'SHOW_DELAY',
+  hideDelay: 'HIDE_DELAY',
 };
 
-export default ExperimentWrapper;
+export default SystemDelayActions;

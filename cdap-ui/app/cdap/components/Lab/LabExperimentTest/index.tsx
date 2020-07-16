@@ -24,11 +24,11 @@ const DEFAULT_EXPERIMENT = 'cdap-common-experiment';
 const LabExperimentTest: React.FC = () => {
   return (
     <div>
-      <ExperimentalFeature name={DEFAULT_EXPERIMENT}>
+      <ExperimentalFeature id={DEFAULT_EXPERIMENT}>
         <p data-cy="experimental-feature-selector">This is an experimental component.</p>
       </ExperimentalFeature>
       <ToggleExperiment
-        name={DEFAULT_EXPERIMENT}
+        id={DEFAULT_EXPERIMENT}
         defaultComponent={
           <p data-cy="default-feature-toggle-selector">This is default component for the toggle.</p>
         }

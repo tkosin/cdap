@@ -34,6 +34,8 @@ import { objectQuery } from 'services/helpers';
 import { NamespaceLinkContext } from 'components/AppHeader/NamespaceLinkContext';
 import ThemeWrapper from 'components/ThemeWrapper';
 import LoadingSVGCentered from 'components/LoadingSVGCentered';
+import SystemServicesDelay from 'components/SystemServicesDelay';
+import ExperimentalFeature from 'components/Lab/ExperimentalFeature';
 
 require('styles/bootstrap_4_patch.scss');
 
@@ -146,6 +148,9 @@ class MyAppHeader extends React.PureComponent<IMyAppHeaderProps, IMyAppHeaderSta
             onClose={this.toggleDrawer}
             componentDidNavigate={this.componentDidNavigate}
           />
+          <ExperimentalFeature id="system-delay-notification">
+            <SystemServicesDelay />
+          </ExperimentalFeature>
         </NamespaceLinkContext.Provider>
       </AppBar>
     );

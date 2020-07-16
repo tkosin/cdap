@@ -490,6 +490,14 @@ function connectWithStore(store, WrappedComponent, ...args) {
   };
 }
 
+function getExperimentValue(experimentID) {
+  return window.localStorage.getItem(`${experimentID}-value`);
+}
+
+function isExperimentEnabled(experimentID) {
+  return window.localStorage.getItem(`${experimentID}`) === 'true' ? true : false;
+}
+
 export {
   objectQuery,
   convertBytesToHumanReadable,
@@ -531,4 +539,6 @@ export {
   handlePageLevelError,
   extractErrorMessage,
   connectWithStore,
+  getExperimentValue,
+  isExperimentEnabled
 };

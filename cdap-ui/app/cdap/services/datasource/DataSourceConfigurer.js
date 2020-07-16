@@ -17,9 +17,9 @@ import Datasource from 'services/datasource';
 import RedirectToLogin from 'services/redirect-to-login';
 
 let DatasourceConfigurer = {
-  getInstance(handlers = []) {
+  getInstance(handlers = [], options) {
     if (Array.isArray(handlers)) {
-      return new Datasource([...handlers, RedirectToLogin]);
+      return new Datasource([...handlers, RedirectToLogin], options);
     } else {
       console.trace();
       throw "'handlers' for Datasource should be an array";

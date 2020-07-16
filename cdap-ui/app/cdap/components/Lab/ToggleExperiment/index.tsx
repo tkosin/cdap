@@ -19,15 +19,15 @@ import * as React from 'react';
 interface IToggleFeatureProps {
   defaultComponent: React.ReactElement<any>;
   experimentalComponent: React.ReactElement<any>;
-  name: string;
+  id: string;
 }
 
 const ToggleFeature: React.SFC<IToggleFeatureProps> = ({
   defaultComponent,
   experimentalComponent,
-  name,
+  id,
 }) => {
-  const featureAvailable = window.localStorage.getItem(name) === 'true';
+  const featureAvailable = window.localStorage.getItem(id) === 'true';
   return featureAvailable ? experimentalComponent : defaultComponent;
 };
 
