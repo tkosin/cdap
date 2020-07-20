@@ -24,7 +24,6 @@ import ee from 'event-emitter';
 import { WINDOW_ON_FOCUS, WINDOW_ON_BLUR } from 'services/WindowManager';
 import { getExperimentValue, isExperimentEnabled } from 'services/helpers';
 import DataSource from 'services/datasource';
-import cloneDeep from 'lodash/cloneDeep';
 import flatten from 'lodash/flatten';
 
 interface IBinding {
@@ -33,7 +32,6 @@ interface IBinding {
     requestTime: number;
   };
   type: string;
-  checkAgainsLeft?: number;
 }
 
 interface ISystemDelayProps {
@@ -41,12 +39,20 @@ interface ISystemDelayProps {
   activeDataSources: DataSource[];
 }
 
+interface ISystemDelayState {
+  showDelay: boolean;
+  delayedBindings: { [key: string]: number };
+}
+
 const EXPERIMENT_ID = 'system-delay-notification';
 const HEALTH_CHECK_INTERVAL = 12000;
 const DEFAULT_DELAY_TIME = 5000;
 
 class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
-  public state = { delayedBindings: [] };
+  public state: ISystemDelayState = {
+    showDelay: false,
+    delayedBindings: {},
+  };
   private healthCheckInterval: NodeJS.Timeout;
   private eventEmitter = ee(ee);
 
@@ -63,6 +69,10 @@ class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
     });
   }
 
+  public componentWillUnmount() {
+    this.stopHealthCheck();
+  }
+
   private startHealthCheck = () => {
     if (isExperimentEnabled(EXPERIMENT_ID)) {
       this.healthCheckInterval = setInterval(this.checkForDelayedBindings, HEALTH_CHECK_INTERVAL);
@@ -75,14 +85,12 @@ class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
       ? parseInt(delayedTimeFromExperiment, 10) * 1000
       : DEFAULT_DELAY_TIME;
     const activeBindings = flatten(
-      this.props.activeDataSources
-        .map((dataSource: DataSource) => dataSource.getBindings())
-        .filter((bindings) => bindings.length > 0)
+      this.props.activeDataSources.map((dataSource: DataSource) =>
+        dataSource.getBindingsListForHealthCheck()
+      )
     );
-    let newlyDelayedBindings = {};
-    const delayedBindingsFromLastTime = cloneDeep(this.state.delayedBindings);
+    const delayedBindings = { ...this.state.delayedBindings };
     const currentTime = Date.now();
-
     const isBindingDelayed = (binding: IBinding) => {
       const bindingStartTime = binding.resource.requestTime;
       return bindingStartTime && currentTime - bindingStartTime > SERVICES_DELAYED_TIME;
@@ -92,45 +100,32 @@ class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
       const { id } = currentBinding.resource;
       if (isBindingDelayed(currentBinding)) {
         // If binding is delayed, add it to list of delayed binding with
-        // new checkAgainsLeft - we will check these many times before
+        // number of rechecks left - we will check these many times before
         // declaring that this binding is not delayed anymore
-        currentBinding.checkAgainsLeft = 2;
-        newlyDelayedBindings[id] = currentBinding;
+        delayedBindings[id] = 2;
       }
-    });
-    Object.values(delayedBindingsFromLastTime).forEach((binding: IBinding) => {
-      const { id } = binding.resource;
-      if (newlyDelayedBindings[id]) {
-        // Newly delayed, already added to newlyDelayedBindings
-        delete delayedBindingsFromLastTime[id];
-      } else {
-        // Previously delayed, wait for 3 intervals (tracked using checkAgainsLeft)
-        // before marking as healthy
-        if (binding.checkAgainsLeft < 1) {
-          delete delayedBindingsFromLastTime[id];
-        } else {
-          binding.checkAgainsLeft -= 1;
-        }
-      }
-      newlyDelayedBindings = {
-        ...newlyDelayedBindings,
-        ...delayedBindingsFromLastTime,
-      };
     });
 
-    if (Object.keys(newlyDelayedBindings).length > 0) {
-      this.setState({ delayedBindings: newlyDelayedBindings }, () => {
+    Object.keys(delayedBindings).forEach((id: string) => {
+      // Previously delayed, wait for 3 intervals (tracked using this.state.delayedBindings)
+      // before marking as healthy
+      if (delayedBindings[id] < 1) {
+        delete delayedBindings[id];
+      } else {
+        delayedBindings[id] -= 1;
+      }
+    });
+    this.setState({ delayedBindings }, () => {
+      if (Object.keys(delayedBindings).length > 0) {
         SystemDelayStore.dispatch({
           type: SystemDelayActions.showDelay,
         });
-      });
-    } else {
-      this.setState({ delayedBindings: {} }, () => {
+      } else {
         SystemDelayStore.dispatch({
           type: SystemDelayActions.hideDelay,
         });
-      });
-    }
+      }
+    });
   };
 
   private stopHealthCheck = () => {

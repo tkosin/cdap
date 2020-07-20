@@ -136,7 +136,7 @@ class MyAppHeader extends React.PureComponent<IMyAppHeaderProps, IMyAppHeaderSta
       return (
         <React.Fragment>
           <LoadingSVGCentered showFullPage />
-          <ExperimentalFeature id="system-delay-notification">
+          <ExperimentalFeature experimentId="system-delay-notification">
             <SystemServicesDelay />
           </ExperimentalFeature>
         </React.Fragment>
@@ -155,7 +155,7 @@ class MyAppHeader extends React.PureComponent<IMyAppHeaderProps, IMyAppHeaderSta
             onClose={this.toggleDrawer}
             componentDidNavigate={this.componentDidNavigate}
           />
-          <ExperimentalFeature id="system-delay-notification">
+          <ExperimentalFeature experimentId="system-delay-notification">
             <SystemServicesDelay />
           </ExperimentalFeature>
         </NamespaceLinkContext.Provider>

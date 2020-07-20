@@ -19,11 +19,11 @@ import If from 'components/If';
 
 interface IExperimentWrapperProps {
   children: React.ReactNode;
-  id: string;
+  experimentId: string;
 }
 
-const ExperimentWrapper: React.FC<IExperimentWrapperProps> = ({ children, id }) => {
-  const featureAvailable = window.localStorage.getItem(id) === 'true';
+const ExperimentWrapper: React.FC<IExperimentWrapperProps> = ({ children, experimentId }) => {
+  const featureAvailable = window.localStorage.getItem(experimentId) === 'true';
   return <If condition={featureAvailable}>{children}</If>;
 };
 

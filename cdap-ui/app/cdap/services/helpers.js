@@ -495,7 +495,7 @@ function getExperimentValue(experimentID) {
 }
 
 function isExperimentEnabled(experimentID) {
-  return window.localStorage.getItem(`${experimentID}`) === 'true' ? true : false;
+  return window.localStorage.getItem(`${experimentID}`) === 'true';
 }
 
 export {

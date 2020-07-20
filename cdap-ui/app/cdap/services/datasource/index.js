@@ -44,11 +44,10 @@ const CDAP_API_VERSION = 'v3';
 const REQUEST_ORIGIN_ROUTER = 'ROUTER';
 
 export default class Datasource {
-  constructor(genericResponseHandlers = [() => true],options) {
+  constructor(genericResponseHandlers = [() => true]) {
   this.eventEmitter = ee(ee);
     let socketData = Socket.getObservable();
     this.bindings = {};
-    this.excludeFromHealthCheck = options ? !!options.excludeFromHealthCheck : false;
     this.socketSubscription = socketData.subscribe((data) => {
       let hash = data.resource.id;
       if (!this.bindings[hash]) {
@@ -123,16 +122,14 @@ export default class Datasource {
     });
     this.eventEmitter.on(WINDOW_ON_FOCUS, this.resumePoll.bind(this));
     this.eventEmitter.on(WINDOW_ON_BLUR, this.pausePoll.bind(this));
-    if (!this.excludeFromHealthCheck) {
       SystemDelayStore.dispatch({
         type: SystemDelayActions.registerDataSource,
         payload: this,
       });
-    }
   }
 
-  getBindings(){
-    return cloneDeep(Object.values(this.bindings));
+  getBindingsListForHealthCheck() {
+    return cloneDeep(Object.values(this.bindings).filter(binding=> !binding.excludeFromHealthCheck));
   }
 
   socketSend(actionType, resource) {
@@ -144,6 +141,7 @@ export default class Datasource {
   }
 
   request(resource = {}) {
+    const excludeFromHealthCheck = !!resource.excludeFromHealthCheck;
     let generatedResource = {
       id: resource.id || uuidV4(),
       json: resource.json === false ? false : true,
@@ -187,6 +185,7 @@ export default class Datasource {
         rx: subject,
         resource: generatedResource,
         type: 'REQUEST',
+        excludeFromHealthCheck,
       };
     }
 
@@ -196,6 +195,7 @@ export default class Datasource {
   }
 
   poll(resource = {}) {
+    const excludeFromHealthCheck = !!resource.excludeFromHealthCheck;
     const id = uuidV4();
     const intervalTime = resource.interval || 10000;
     let generatedResource = {
@@ -261,6 +261,7 @@ export default class Datasource {
       rx: subject,
       resource: generatedResource,
       type: 'POLL',
+      excludeFromHealthCheck,
     };
 
     this.socketSend('request', generatedResource);

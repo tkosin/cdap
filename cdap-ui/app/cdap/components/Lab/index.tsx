@@ -59,7 +59,7 @@ const styles = (): StyleRules => {
 
 interface ILabProps extends WithStyles<typeof styles> {}
 interface IExperiment {
-  id: string;
+  experimentId: string;
   enabled: boolean;
   screenshot: string | null;
   name: string;
@@ -77,11 +77,11 @@ class Lab extends React.Component<ILabProps, ILabState> {
     experimentsList.forEach((experiment: IExperiment) => {
       // If experiment preference is present in storage, use it.
       // If not, use the default value and set it in storage and use it.
-      const experimentStatusFromStorage = window.localStorage.getItem(experiment.id);
+      const experimentStatusFromStorage = window.localStorage.getItem(experiment.experimentId);
       if (experimentStatusFromStorage === null) {
-        window.localStorage.setItem(experiment.id, experiment.enabled.toString());
+        window.localStorage.setItem(experiment.experimentId, experiment.enabled.toString());
       } else {
-        experiment.enabled = experimentStatusFromStorage === 'true' ? true : false;
+        experiment.enabled = experimentStatusFromStorage === 'true';
       }
     });
     this.setState({ experiments: experimentsList });
@@ -89,7 +89,7 @@ class Lab extends React.Component<ILabProps, ILabState> {
 
   public updatePreference = (event: React.ChangeEvent<HTMLInputElement>) => {
     const experiments = this.state.experiments.map((experiment: IExperiment) => {
-      if (experiment.id === event.target.name) {
+      if (experiment.experimentId === event.target.name) {
         experiment.enabled = !experiment.enabled;
         window.localStorage.setItem(event.target.name, experiment.enabled.toString());
       }
@@ -125,7 +125,7 @@ class Lab extends React.Component<ILabProps, ILabState> {
             <TableBody>
               {this.state &&
                 this.state.experiments.map((experiment: IExperiment) => (
-                  <TableRow key={experiment.id}>
+                  <TableRow key={experiment.experimentId}>
                     <TableCell>
                       {experiment.screenshot ? (
                         <img className={classes.screenshot} src={experiment.screenshot} />
@@ -138,18 +138,18 @@ class Lab extends React.Component<ILabProps, ILabState> {
                       <br />
                       <Typography variant="body1">{experiment.description}</Typography>
                       <br />
-                      <Typography variant="caption">ID: {experiment.id}</Typography>
+                      <Typography variant="caption">ID: {experiment.experimentId}</Typography>
                       <br />
                       <If condition={experiment.showValue}>
                         <TextField
-                          data-cy={`${experiment.id}-field`}
+                          data-cy={`${experiment.experimentId}-field`}
                           variant="outlined"
                           margin="dense"
                           label={experiment.valueLabel || 'Experiment value'}
                           type={experiment.valueType}
                           onChange={this.updateExperimentValue}
-                          name={`${experiment.id}-value`}
-                          defaultValue={getExperimentValue(experiment.id)}
+                          name={`${experiment.experimentId}-value`}
+                          defaultValue={getExperimentValue(experiment.experimentId)}
                         ></TextField>
                       </If>
                     </TableCell>
@@ -158,8 +158,8 @@ class Lab extends React.Component<ILabProps, ILabState> {
                         label={experiment.enabled ? 'Enabled' : 'Disabled'}
                         control={
                           <Switch
-                            data-cy={`${experiment.id}-switch`}
-                            name={experiment.id}
+                            data-cy={`${experiment.experimentId}-switch`}
+                            name={experiment.experimentId}
                             color="primary"
                             onChange={this.updatePreference}
                             checked={experiment.enabled}
