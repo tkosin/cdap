@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,4 +14,15 @@
  * the License.
  */
 
-angular.module(PKG.name + '.feature.logviewer', [PKG.name + '.commons']);
+import { List, Map } from 'immutable';
+
+import { IRequestHistory } from 'components/HttpExecutor/RequestHistoryTab';
+import moment from 'moment';
+
+export function getDateID(date: Date) {
+  return moment(date).format('dddd, MMMM D, YYYY');
+}
+
+export function getRequestsByDate(log: Map<string, List<IRequestHistory>>, dateID: string) {
+  return log.get(dateID) || List([]);
+}
