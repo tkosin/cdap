@@ -40,18 +40,17 @@ interface ISystemDelayProps {
 }
 
 interface ISystemDelayState {
-  showDelay: boolean;
-  delayedBindings: { [key: string]: number };
+  cleanChecksNeeded: number;
 }
 
 const EXPERIMENT_ID = 'system-delay-notification';
 const HEALTH_CHECK_INTERVAL = 12000;
 const DEFAULT_DELAY_TIME = 5000;
+const CLEAN_CHECK_COUNT = 3;
 
 class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
   public state: ISystemDelayState = {
-    showDelay: false,
-    delayedBindings: {},
+    cleanChecksNeeded: 0,
   };
   private healthCheckInterval: NodeJS.Timeout;
   private eventEmitter = ee(ee);
@@ -89,47 +88,42 @@ class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
         dataSource.getBindingsListForHealthCheck()
       )
     );
-    const delayedBindings = { ...this.state.delayedBindings };
     const currentTime = Date.now();
     const isBindingDelayed = (binding: IBinding) => {
       const bindingStartTime = binding.resource.requestTime;
       return bindingStartTime && currentTime - bindingStartTime > SERVICES_DELAYED_TIME;
     };
 
-    Object.values(activeBindings).forEach((currentBinding: IBinding) => {
-      const { id } = currentBinding.resource;
-      if (isBindingDelayed(currentBinding)) {
-        // If binding is delayed, add it to list of delayed binding with
-        // number of rechecks left - we will check these many times before
-        // declaring that this binding is not delayed anymore
-        delayedBindings[id] = 2;
-      }
-    });
-
-    Object.keys(delayedBindings).forEach((id: string) => {
-      // Previously delayed, wait for 3 intervals (tracked using this.state.delayedBindings)
-      // before marking as healthy
-      if (delayedBindings[id] < 1) {
-        delete delayedBindings[id];
+    const hasDelayedBinding = Object.values(activeBindings).some((currentBinding: IBinding) =>
+      isBindingDelayed(currentBinding)
+    );
+    if (hasDelayedBinding) {
+      // If there is atleast one delayed binding, show the delay and we need to wait for CLEAN_CHECK_COUNT
+      // more cycles with no delayed bindings before we can remove the notification
+      this.setState({ cleanChecksNeeded: CLEAN_CHECK_COUNT }, () => {
+        if (!this.props.showDelay) {
+          SystemDelayStore.dispatch({
+            type: SystemDelayActions.showDelay,
+          });
+        }
+      });
+    } else {
+      if (this.state.cleanChecksNeeded > 0) {
+        // No delayed bindings and we need more checks before we can say there is no delay
+        this.setState({ cleanChecksNeeded: this.state.cleanChecksNeeded - 1 });
       } else {
-        delayedBindings[id] -= 1;
+        // If we complete CLEAN_CHECK_COUNT intervals with no delays, we hide the notification
+        if (this.props.showDelay) {
+          SystemDelayStore.dispatch({
+            type: SystemDelayActions.hideDelay,
+          });
+        }
       }
-    });
-    this.setState({ delayedBindings }, () => {
-      if (Object.keys(delayedBindings).length > 0) {
-        SystemDelayStore.dispatch({
-          type: SystemDelayActions.showDelay,
-        });
-      } else {
-        SystemDelayStore.dispatch({
-          type: SystemDelayActions.hideDelay,
-        });
-      }
-    });
+    }
   };
 
   private stopHealthCheck = () => {
-    this.setState({ delayedBindings: {} }, () => {
+    this.setState({ cleanChecksNeeded: 0 }, () => {
       SystemDelayStore.dispatch({
         type: SystemDelayActions.hideDelay,
       });
