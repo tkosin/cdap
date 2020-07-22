@@ -26,12 +26,8 @@ import { getExperimentValue, isExperimentEnabled } from 'services/helpers';
 import DataSource from 'services/datasource';
 import flatten from 'lodash/flatten';
 
-interface IBinding {
-  resource: {
-    id: string;
-    requestTime: number;
-  };
-  type: string;
+interface IBindingsMap {
+  [key: string]: number;
 }
 
 interface ISystemDelayProps {
@@ -83,19 +79,20 @@ class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
     const SERVICES_DELAYED_TIME = delayedTimeFromExperiment
       ? parseInt(delayedTimeFromExperiment, 10) * 1000
       : DEFAULT_DELAY_TIME;
-    const activeBindings = flatten(
-      this.props.activeDataSources.map((dataSource: DataSource) =>
-        dataSource.getBindingsListForHealthCheck()
-      )
-    );
+    const bindingsMap = {};
+    this.props.activeDataSources.forEach((dataSource: DataSource) => {
+      const bindings = dataSource.getBindingsForHealthCheck();
+      Object.keys(bindings).forEach((id) => {
+        bindingsMap[id] = bindings[id];
+      });
+    });
     const currentTime = Date.now();
-    const isBindingDelayed = (binding: IBinding) => {
-      const bindingStartTime = binding.resource.requestTime;
+    const isBindingDelayed = (id: string, bindingsMap: IBindingsMap) => {
+      const bindingStartTime = bindingsMap[id];
       return bindingStartTime && currentTime - bindingStartTime > SERVICES_DELAYED_TIME;
     };
-
-    const hasDelayedBinding = Object.values(activeBindings).some((currentBinding: IBinding) =>
-      isBindingDelayed(currentBinding)
+    const hasDelayedBinding = Object.keys(bindingsMap).some((id: string) =>
+      isBindingDelayed(id, bindingsMap)
     );
     if (hasDelayedBinding) {
       // If there is atleast one delayed binding, show the delay and we need to wait for CLEAN_CHECK_COUNT
