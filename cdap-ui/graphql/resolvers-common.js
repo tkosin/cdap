@@ -31,7 +31,7 @@ export function getPOSTRequestOptions() {
   };
 }
 
-export function requestPromiseWrapper(options, token, bodyModifiersFn) {
+export function requestPromiseWrapper(options, token, bodyModifiersFn, errorModifiersFn) {
   if (token) {
     options.headers = {
       Authorization: token,
@@ -41,14 +41,24 @@ export function requestPromiseWrapper(options, token, bodyModifiersFn) {
   return new Promise((resolve, reject) => {
     request(options, (err, response, body) => {
       if (err) {
-        const error =  new ApolloError(err, '500');
-        return reject(error);
+        let exception;
+        if (typeof errorModifiersFn === 'function') {
+          exception = errorModifiersFn(err, '500');
+        } else {
+          exception = new ApolloError(err, '500');
+        }
+        return reject(exception);
       }
 
       const statusCode = response.statusCode;
 
       if (typeof statusCode === 'undefined' || statusCode != 200) {
-        const error = new ApolloError(body, statusCode.toString());
+        let error;
+        if (typeof errorModifiersFn === 'function') {
+          error = errorModifiersFn(body, statusCode.toString());
+        } else {
+          error = new ApolloError(body, statusCode.toString());
+        }
         return reject(error);
       }
 
