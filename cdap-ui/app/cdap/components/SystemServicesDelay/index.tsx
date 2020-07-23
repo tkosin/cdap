@@ -24,12 +24,10 @@ import ee from 'event-emitter';
 import { WINDOW_ON_FOCUS, WINDOW_ON_BLUR } from 'services/WindowManager';
 import { getExperimentValue, isExperimentEnabled } from 'services/helpers';
 import DataSource from 'services/datasource';
-import flatten from 'lodash/flatten';
 
-interface IBindingsMap {
-  [key: string]: number;
+interface IHealthCheckBindings {
+  [key: string]: number | null;
 }
-
 interface ISystemDelayProps {
   showDelay: boolean;
   activeDataSources: DataSource[];
@@ -79,21 +77,14 @@ class SystemServicesDelayView extends React.Component<ISystemDelayProps> {
     const SERVICES_DELAYED_TIME = delayedTimeFromExperiment
       ? parseInt(delayedTimeFromExperiment, 10) * 1000
       : DEFAULT_DELAY_TIME;
-    const bindingsMap = {};
-    this.props.activeDataSources.forEach((dataSource: DataSource) => {
-      const bindings = dataSource.getBindingsForHealthCheck();
-      Object.keys(bindings).forEach((id) => {
-        bindingsMap[id] = bindings[id];
+    const currentTime = Date.now();
+    const hasDelayedBinding = this.props.activeDataSources.some((dataSource: DataSource) => {
+      const bindings = dataSource.getBindingsForHealthCheck() as IHealthCheckBindings;
+      return Object.keys(bindings).some((id) => {
+        const requestTime = bindings[id];
+        return requestTime && currentTime - requestTime > SERVICES_DELAYED_TIME;
       });
     });
-    const currentTime = Date.now();
-    const isBindingDelayed = (id: string, bindingsMap: IBindingsMap) => {
-      const bindingStartTime = bindingsMap[id];
-      return bindingStartTime && currentTime - bindingStartTime > SERVICES_DELAYED_TIME;
-    };
-    const hasDelayedBinding = Object.keys(bindingsMap).some((id: string) =>
-      isBindingDelayed(id, bindingsMap)
-    );
     if (hasDelayedBinding) {
       // If there is atleast one delayed binding, show the delay and we need to wait for CLEAN_CHECK_COUNT
       // more cycles with no delayed bindings before we can remove the notification

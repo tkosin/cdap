@@ -129,15 +129,15 @@ export default class Datasource {
   }
 
   getBindingsForHealthCheck() {
-    const bindingsWithTime={};
-     Object.values(this.bindings)
-        .filter(binding => !binding.excludeFromHealthCheck)
-        .forEach(binding => {
-          const id = objectQuery(binding,'resource','id');
-          const requestTime = objectQuery(binding, 'resource', 'requestTime');
-          bindingsWithTime[id] = requestTime;
-        });
-        return bindingsWithTime;
+    const bindingsWithTime = {};
+    Object.values(this.bindings).forEach(binding => {
+      if (!binding.excludeFromHealthCheck) {
+        const id = objectQuery(binding, 'resource', 'id');
+        const requestTime = objectQuery(binding, 'resource', 'requestTime');
+        bindingsWithTime[id] = requestTime;
+      }
+    });
+    return bindingsWithTime;
   }
 
   socketSend(actionType, resource) {
