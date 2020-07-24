@@ -71,15 +71,15 @@ describe('Secure Key Manager Page', () => {
     it('should delete MOCK_SECURE_KEYS before testing if they already exist in the secure storage', () => {
       cy.get('body').then((body) => {
         MOCK_SECURE_KEYS.forEach((key) => {
-          const secureKeyRow = dataCy(`secure-key-row-${key.name}`);
-          if (body.find(secureKeyRow).length > 0) {
-            cy.get(secureKeyRow).click();
+          const secureKeyMenu = `${dataCy(`secure-key-row-${key.name}`)} ${dataCy(`menu-icon`)}`;
+          if (body.find(secureKeyMenu).length > 0) {
+            cy.get(secureKeyMenu).click();
 
             // open a delete dialog
             cy.get(dataCy('delete-secure-key')).click();
 
             // confirm delete
-            cy.get(dataCy('secure-key-delete-confirm')).click();
+            cy.get(dataCy('Delete')).click();
             cy.wait(6000); // wait for success alert component to disappear
           }
         });
@@ -110,10 +110,8 @@ describe('Secure Key Manager Page', () => {
       const additionalLetter = '1';
 
       // Click on a table row of the first secure key
+      // This will open a edit dialog
       cy.get(dataCy(`secure-key-row-${keyToEdit.name}`)).click();
-
-      // open a edit dialog
-      cy.get(dataCy('edit-secure-key')).click();
 
       // edit the description of secure key
       cy.get(dataCy('secure-key-description'))
@@ -128,22 +126,17 @@ describe('Secure Key Manager Page', () => {
       cy.get(dataCy('save-secure-key')).click();
       cy.wait(6000); // wait for success alert component to disappear
 
+      // Open edit dialog again
+      cy.get(dataCy(`secure-key-row-${keyToEdit.name}`)).click();
+
       // validate whether the description is updated successfully
-      cy.get(`${dataCy('secure-key-description-view-only')} input`)
+      cy.get(`${dataCy('secure-key-description')} input`)
         .invoke('val')
         .then((val) => {
           expect(val).equals(keyToEdit.description + additionalLetter); // since we typed '1'
         });
 
-      // validate whether the data is updated successfully
-      cy.get(dataCy('toggle-secure-data-visibility')).click(); // toggle visibility for secure data
-      cy.get(`${dataCy('secure-key-data-view-only')} input`)
-        .invoke('val')
-        .then((val) => {
-          expect(val).equals(keyToEdit.data + additionalLetter); // since we typed '1'
-        });
-
-      cy.get(dataCy('back-button')).click(); // go back to secure key list
+      cy.get(dataCy('close-edit-dialog')).click();
     });
 
     it('should search for secure keys', () => {

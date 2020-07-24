@@ -14,16 +14,15 @@
  * the License.
  */
 
+import * as React from 'react';
+
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-import If from 'components/If';
-import { Map } from 'immutable';
-import React from 'react';
 import { preventPropagation } from 'services/helpers';
 
 const styles = (theme): StyleRules => {
@@ -37,74 +36,46 @@ const styles = (theme): StyleRules => {
 };
 
 interface ISecureKeyActionButtonsProps extends WithStyles<typeof styles> {
+  openDeleteDialog: (index: number) => void;
   keyIndex: number;
-  keyID: string;
-  visibility: Map<string, boolean>;
-  setActiveKeyIndex: (index: number) => void;
-  setVisibility: (visibility: Map<string, boolean>) => void;
-  setEditMode: (mode: boolean) => void;
-  setDeleteMode: (mode: boolean) => void;
 }
 
 const SecureKeyActionButtonsView: React.FC<ISecureKeyActionButtonsProps> = ({
   classes,
+  openDeleteDialog,
   keyIndex,
-  keyID,
-  visibility,
-  setActiveKeyIndex,
-  setVisibility,
-  setEditMode,
-  setDeleteMode,
 }) => {
   // Anchor element that appears when menu is clicked
   const [menuEl, setMenuEl] = React.useState(null);
-
-  const toggleVisibility = (event) => {
-    preventPropagation(event);
-    setVisibility(visibility.set(keyID, !visibility.get(keyID)));
-  };
 
   const handleMenuClick = (event) => {
     preventPropagation(event);
     setMenuEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
-    setMenuEl(null);
-  };
-
-  const onDetailsClick = (event, index) => {
+  const handleMenuClose = (event) => {
     preventPropagation(event);
-    setActiveKeyIndex(index);
-    setEditMode(true);
     setMenuEl(null);
   };
 
   const onDeleteClick = (event, index) => {
-    preventPropagation(event);
-    setActiveKeyIndex(index);
-    setDeleteMode(true);
-    setMenuEl(null);
+    openDeleteDialog(index);
+    handleMenuClose(event);
   };
 
   return (
     <div className={classes.secureKeyActionButtons}>
-      <IconButton onClick={toggleVisibility}>
-        <If condition={!visibility.get(keyID)}>
-          <VisibilityIcon />
-        </If>
-        <If condition={visibility.get(keyID)}>
-          <VisibilityOffIcon />
-        </If>
-      </IconButton>
       <div>
         <IconButton onClick={handleMenuClick}>
-          <MoreVertIcon />
+          <MoreVertIcon data-cy="menu-icon" />
         </IconButton>
-        <Menu anchorEl={menuEl} open={Boolean(menuEl)} onClose={handleMenuClose}>
-          <MenuItem onClick={(e) => onDetailsClick(e, keyIndex)}>Details</MenuItem>
-          <MenuItem onClick={(e) => onDeleteClick(e, keyIndex)}>Delete</MenuItem>
-        </Menu>
+        <ClickAwayListener onClickAway={handleMenuClose}>
+          <Menu anchorEl={menuEl} open={Boolean(menuEl)} onClose={handleMenuClose}>
+            <MenuItem onClick={(e) => onDeleteClick(e, keyIndex)} data-cy="delete-secure-key">
+              Delete
+            </MenuItem>
+          </Menu>
+        </ClickAwayListener>
       </div>
     </div>
   );

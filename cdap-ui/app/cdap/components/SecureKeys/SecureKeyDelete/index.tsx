@@ -14,37 +14,26 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import ConfirmationModal from 'components/ConfirmationModal';
 import { MySecureKeyApi } from 'api/securekey';
-import If from 'components/If';
-import { SecureKeysPageMode, SecureKeyStatus } from 'components/SecureKeys';
-import { List } from 'immutable';
 import React from 'react';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 
 interface ISecureKeyDeleteProps {
+  state: any;
   open: boolean;
   handleClose: () => void;
-  secureKeys: List<any>;
-  activeKeyIndex: number;
-  setActiveKeyIndex: (index: number) => void;
-  setPageMode: (mode: SecureKeysPageMode) => void;
-  setSecureKeyStatus: (status: SecureKeyStatus) => void;
+  alertSuccess: () => void;
 }
 
 const SecureKeyDelete: React.FC<ISecureKeyDeleteProps> = ({
+  state,
   open,
-  secureKeys,
   handleClose,
-  activeKeyIndex,
-  setActiveKeyIndex,
-  setPageMode,
-  setSecureKeyStatus,
+  alertSuccess,
 }) => {
+  const { secureKeys, activeKeyIndex } = state;
+
   const deleteSecureKey = () => {
     const key = secureKeys.get(activeKeyIndex).get('name');
 
@@ -56,29 +45,19 @@ const SecureKeyDelete: React.FC<ISecureKeyDeleteProps> = ({
 
     MySecureKeyApi.delete(params).subscribe(() => {
       handleClose();
-      setPageMode(SecureKeysPageMode.List);
-      setActiveKeyIndex(null);
-      setSecureKeyStatus(SecureKeyStatus.Success);
+      alertSuccess();
     });
   };
 
   return (
-    <If condition={open}>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Delete secure key</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete your secure key from your CDAP Account?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={deleteSecureKey} color="primary" data-cy="secure-key-delete-confirm">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </If>
+    <ConfirmationModal
+      headerTitle={'Delete secure key'}
+      confirmationElem={'Are you sure you want to delete your secure key from your CDAP Account?'}
+      confirmButtonText={'Delete'}
+      confirmFn={deleteSecureKey}
+      cancelFn={handleClose}
+      isOpen={open}
+    />
   );
 };
 

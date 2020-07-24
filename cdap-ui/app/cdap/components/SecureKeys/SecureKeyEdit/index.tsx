@@ -14,66 +14,56 @@
  * the License.
  */
 
+import { COMMON_DELIMITER, COMMON_KV_DELIMITER } from 'components/SecureKeys/constants';
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import TextField from '@material-ui/core/TextField';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import { MySecureKeyApi } from 'api/securekey';
-import classnames from 'classnames';
-import WidgetWrapper from 'components/ConfigurationGroup/WidgetWrapper';
-import { COMMON_DELIMITER, COMMON_KV_DELIMITER } from 'components/PluginJSONCreator/constants';
-import { SecureKeyStatus } from 'components/SecureKeys';
 import { Map } from 'immutable';
-import isNil from 'lodash/isNil';
+import { MySecureKeyApi } from 'api/securekey';
 import React from 'react';
+import TextField from '@material-ui/core/TextField';
+import WidgetWrapper from 'components/ConfigurationGroup/WidgetWrapper';
 import { getCurrentNamespace } from 'services/NamespaceStore';
+import isNil from 'lodash/isNil';
 
 const styles = (theme): StyleRules => {
   return {
-    margin: {
+    secureKeyInput: {
       margin: `${theme.Spacing(3)}px ${theme.spacing(1)}px`,
-    },
-    textField: {
-      width: '45ch',
-    },
-    keyvalueField: {
-      width: '60ch',
     },
   };
 };
 
 interface ISecureKeyEditProps extends WithStyles<typeof styles> {
-  keyMetadata: any;
-  setSecureKeyStatus: (status: SecureKeyStatus) => void;
+  state: any;
   open: boolean;
   handleClose: () => void;
+  alertSuccess: () => void;
 }
 
 const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
   classes,
+  state,
   open,
+  alertSuccess,
   handleClose,
-  keyMetadata,
-  setSecureKeyStatus,
 }) => {
+  const { secureKeys, activeKeyIndex } = state;
+
+  const keyMetadata = secureKeys.get(activeKeyIndex);
   const keyID = keyMetadata ? keyMetadata.get('name') : '';
   const [localDescription, setLocalDescription] = React.useState(
     keyMetadata ? keyMetadata.get('description') : ''
   );
-  const [localData, setLocalData] = React.useState(keyMetadata ? keyMetadata.get('data') : '');
-
+  const [localData, setLocalData] = React.useState('');
   // since 'properties' are in key-value form, keep a separate state in string form
   const properties = keyMetadata ? keyMetadata.get('properties') : '';
   const [localPropertiesInString, setLocalPropertiesInString] = React.useState('');
 
-  const [showData, setShowData] = React.useState(false);
   const [valueIsChanged, setValueIsChanged] = React.useState(false);
 
   React.useEffect(() => {
@@ -112,10 +102,6 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
     return keyvaluePairs;
   };
 
-  const saveSecureKey = () => {
-    editSecureKey();
-  };
-
   const editSecureKey = () => {
     const namespace = getCurrentNamespace();
 
@@ -126,15 +112,15 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
 
     const requestBody = {
       description: localDescription,
-      data: localData,
       properties: convertLocalPropertiesInString(localPropertiesInString),
+      data: localData,
     };
 
     MySecureKeyApi.put(params, requestBody).subscribe(() => {
       setLocalDescription('');
       setLocalData('');
       setLocalPropertiesInString('');
-      setSecureKeyStatus(SecureKeyStatus.Success);
+      alertSuccess();
       handleClose();
     });
   };
@@ -143,43 +129,36 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Edit {keyID}</DialogTitle>
       <DialogContent>
-        <div className={classnames(classes.margin, classes.textField)}>
+        <div className={classes.secureKeyInput}>
           <TextField
+            required
             variant="outlined"
             label="Description"
             defaultValue={localDescription}
             onChange={onLocalDescriptionChange}
+            fullWidth
             InputProps={{
               className: classes.textField,
             }}
             data-cy="secure-key-description"
           />
         </div>
-        <div className={classnames(classes.margin, classes.textField)}>
+        <div className={classes.secureKeyInput}>
           <TextField
+            required
             variant="outlined"
             label="Data"
-            type={showData ? 'text' : 'password'}
+            type={'password'}
             value={localData}
             onChange={onLocalDataChange}
+            fullWidth
             InputProps={{
               className: classes.textField,
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowData(!showData)}
-                    edge="end"
-                  >
-                    {showData ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
             }}
             data-cy="secure-key-data"
           />
         </div>
-        <div className={classnames(classes.margin, classes.keyvalueField)}>
+        <div className={classes.secureKeyInput}>
           <WidgetWrapper
             widgetProperty={{
               label: 'Properties',
@@ -203,13 +182,13 @@ const SecureKeyEditView: React.FC<ISecureKeyEditProps> = ({
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleClose} color="primary" data-cy="close-edit-dialog">
           Cancel
         </Button>
         <Button
-          onClick={saveSecureKey}
+          onClick={editSecureKey}
           color="primary"
-          disabled={!valueIsChanged}
+          disabled={!valueIsChanged || !localDescription || !localData}
           data-cy="save-secure-key"
         >
           Save

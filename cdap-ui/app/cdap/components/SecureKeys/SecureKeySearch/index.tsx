@@ -14,15 +14,16 @@
  * the License.
  */
 
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import CloseIcon from '@material-ui/icons/Close';
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import TextField from '@material-ui/core/TextField';
-import CloseIcon from '@material-ui/icons/Close';
-import Search from '@material-ui/icons/Search';
-import classnames from 'classnames';
 import React from 'react';
+import Search from '@material-ui/icons/Search';
+import TextField from '@material-ui/core/TextField';
+import classnames from 'classnames';
 
 const styles = (theme): StyleRules => {
   return {
@@ -37,20 +38,20 @@ const styles = (theme): StyleRules => {
 
 interface ISecureKeySearchProps extends WithStyles<typeof styles> {
   searchText: string;
-  handleSearchTextChange: (searchText: string) => void;
+  setSearchText: (searchText: string) => void;
 }
 
 const SecureKeySearchView: React.FC<ISecureKeySearchProps> = ({
   classes,
   searchText,
-  handleSearchTextChange,
+  setSearchText,
 }) => {
   return (
     <FormControl className={classnames(classes.margin, classes.textField)} variant="outlined">
       <TextField
         className={classes.margin}
         value={searchText}
-        onChange={(e) => handleSearchTextChange(e.target.value)}
+        onChange={(e) => setSearchText(e.target.value)}
         placeholder={'Search secure keys'}
         InputProps={{
           startAdornment: (
@@ -62,7 +63,7 @@ const SecureKeySearchView: React.FC<ISecureKeySearchProps> = ({
           ),
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={() => handleSearchTextChange('')}>
+              <IconButton onClick={() => setSearchText('')}>
                 <CloseIcon />
               </IconButton>
             </InputAdornment>

@@ -14,61 +14,52 @@
  * the License.
  */
 
+import { COMMON_DELIMITER, COMMON_KV_DELIMITER } from 'components/SecureKeys/constants';
+import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
-import TextField from '@material-ui/core/TextField';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { Map } from 'immutable';
 import { MySecureKeyApi } from 'api/securekey';
-import classnames from 'classnames';
-import WidgetWrapper from 'components/ConfigurationGroup/WidgetWrapper';
-import { COMMON_DELIMITER, COMMON_KV_DELIMITER } from 'components/PluginJSONCreator/constants';
-import { SecureKeyStatus } from 'components/SecureKeys';
-import { List, Map } from 'immutable';
 import React from 'react';
+import TextField from '@material-ui/core/TextField';
+import WidgetWrapper from 'components/ConfigurationGroup/WidgetWrapper';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 
 const styles = (theme): StyleRules => {
   return {
-    margin: {
+    secureKeyInput: {
       margin: `${theme.Spacing(3)}px ${theme.spacing(1)}px`,
-    },
-    textField: {
-      width: '45ch',
-    },
-    keyvalueField: {
-      width: '60ch',
     },
   };
 };
 
 interface ISecureKeyCreateProps extends WithStyles<typeof styles> {
-  secureKeys: List<any>;
-  setSecureKeyStatus: (status: SecureKeyStatus) => void;
+  state: any;
   open: boolean;
   handleClose: () => void;
+  alertSuccess: () => void;
+  alertFailure: () => void;
 }
 
 const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
   classes,
-  setSecureKeyStatus,
-  secureKeys,
+  state,
   open,
   handleClose,
+  alertSuccess,
+  alertFailure,
 }) => {
+  const { secureKeys } = state;
+
   const [localName, setLocalName] = React.useState('');
   const [localDescription, setLocalDescription] = React.useState('');
   const [localData, setLocalData] = React.useState('');
   // 'properties' are in key-value form, keep a state in string form
   const [localPropertiesInString, setLocalPropertiesInString] = React.useState('');
-
-  const [showData, setShowData] = React.useState(false);
 
   const onLocalNameChange = (e) => {
     setLocalName(e.target.value);
@@ -99,7 +90,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
     // Duplicate key name should raise an error
     const keyIDs = secureKeys.map((key) => key.get('name'));
     if (keyIDs.includes(localName)) {
-      setSecureKeyStatus(SecureKeyStatus.Failure);
+      alertFailure();
       return;
     }
 
@@ -125,7 +116,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
       setLocalDescription('');
       setLocalData('');
       setLocalPropertiesInString('');
-      setSecureKeyStatus(SecureKeyStatus.Success);
+      alertSuccess();
       handleClose();
     });
   };
@@ -134,55 +125,50 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Create secure key</DialogTitle>
       <DialogContent>
-        <div className={classnames(classes.margin, classes.textField)}>
+        <div className={classes.secureKeyInput}>
           <TextField
+            required
             variant="outlined"
             label="Name"
             defaultValue={localName}
             onChange={onLocalNameChange}
+            fullWidth
             InputProps={{
               className: classes.textField,
             }}
             data-cy="secure-key-name"
           />
         </div>
-        <div className={classnames(classes.margin, classes.textField)}>
+        <div className={classes.secureKeyInput}>
           <TextField
+            required
             variant="outlined"
             label="Description"
             defaultValue={localDescription}
             onChange={onLocalDescriptionChange}
+            fullWidth
             InputProps={{
               className: classes.textField,
             }}
             data-cy="secure-key-description"
           />
         </div>
-        <div className={classnames(classes.margin, classes.textField)}>
+        <div className={classes.secureKeyInput}>
           <TextField
+            required
             variant="outlined"
             label="Data"
-            type={showData ? 'text' : 'password'}
+            type="password"
             value={localData}
             onChange={onLocalDataChange}
+            fullWidth
             InputProps={{
               className: classes.textField,
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowData(!showData)}
-                    edge="end"
-                  >
-                    {showData ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
             }}
             data-cy="secure-key-data"
           />
         </div>
-        <div className={classnames(classes.margin, classes.keyvalueField)}>
+        <div className={classes.secureKeyInput}>
           <WidgetWrapper
             widgetProperty={{
               label: 'Properties',

@@ -14,30 +14,44 @@
  * the License.
  */
 
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
+import * as React from 'react';
+
 import withStyles, { StyleRules, WithStyles } from '@material-ui/core/styles/withStyles';
+
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import SecureKeyActionButtons from 'components/SecureKeys/SecureKeyList/SecureKeyActionButtons';
+import SecureKeyCreate from 'components/SecureKeys/SecureKeyCreate';
+import SecureKeySearch from 'components/SecureKeys/SecureKeySearch';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import If from 'components/If';
-import LoadingSVGCentered from 'components/LoadingSVGCentered';
-import { SecureKeysPageMode, SecureKeyStatus } from 'components/SecureKeys';
-import SecureKeyCreate from 'components/SecureKeys/SecureKeyCreate';
-import SecureKeyActionButtons from 'components/SecureKeys/SecureKeyList/SecureKeyActionButtons';
-import SecureKeySearch from 'components/SecureKeys/SecureKeySearch';
-import { List, Map } from 'immutable';
-import * as React from 'react';
+
+export const CustomTableCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: theme.palette.grey['300'],
+    color: theme.palette.common.white,
+    padding: '5px 10px',
+    fontSize: 13,
+    '&:first-of-type': {
+      borderRight: `1px solid ${theme.palette.grey['500']}`,
+    },
+  },
+  body: {
+    padding: '5px 10px',
+    fontSize: 13,
+    '&:first-of-type': {
+      borderRight: `1px solid ${theme.palette.grey['500']}`,
+    },
+  },
+}))(TableCell);
 
 const styles = (theme): StyleRules => {
   return {
-    divider: {
-      width: '100vw',
-    },
     secureKeysTitle: {
+      fontSize: '20px',
       paddingTop: theme.spacing(1),
     },
     secureKeyManager: {
@@ -53,7 +67,17 @@ const styles = (theme): StyleRules => {
       gridRow: '1',
       gridColumnStart: '7',
     },
-    securityKeyRow: {
+    root: {
+      width: '100%',
+      display: 'inline-block',
+      height: 'auto',
+      marginTop: theme.spacing(1),
+    },
+    row: {
+      height: 40,
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.grey['600'],
+      },
       cursor: 'pointer',
       hover: {
         cursor: 'pointer',
@@ -63,65 +87,52 @@ const styles = (theme): StyleRules => {
       width: '30%',
     },
     descriptionCell: {
-      width: '40%',
-    },
-    dataCell: {
-      width: '20%',
+      width: '60%',
     },
     actionButtonsCell: {
       width: '10%',
-    },
-    loadingBox: {
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
   };
 };
 
 interface ISecureKeyListProps extends WithStyles<typeof styles> {
-  secureKeys: List<any>;
-  setSecureKeyStatus: (status: SecureKeyStatus) => void;
-  setActiveKeyIndex: (index: number) => void;
-  visibility: Map<string, boolean>;
-  setVisibility: (visibility: Map<string, boolean>) => void;
-  setPageMode: (pageMode: SecureKeysPageMode) => void;
-  searchText: string;
-  handleSearchTextChange: (searchText: string) => void;
-  setEditMode: (mode: boolean) => void;
-  setDeleteMode: (mode: boolean) => void;
-  loading: boolean;
+  state: any;
+  alertSuccess: () => void;
+  alertFailure: () => void;
+  openEditDialog: (index: number) => void;
+  openDeleteDialog: (index: number) => void;
 }
 
 const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
   classes,
-  secureKeys,
-  setSecureKeyStatus,
-  setActiveKeyIndex,
-  visibility,
-  setVisibility,
-  setPageMode,
-  searchText,
-  handleSearchTextChange,
-  setEditMode,
-  setDeleteMode,
-  loading,
+  state,
+  alertSuccess,
+  alertFailure,
+  openEditDialog,
+  openDeleteDialog,
 }) => {
+  const { secureKeys } = state;
+
+  // used for filtering down secure keys
+  const [searchText, setSearchText] = React.useState('');
+
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
-  const onSecureKeyClick = (keyIndex) => {
-    return () => {
-      setPageMode(SecureKeysPageMode.Details);
-      setActiveKeyIndex(keyIndex);
-    };
-  };
+  const filteredSecureKeys = secureKeys.filter(
+    (key) =>
+      key
+        .get('name')
+        .toLowerCase()
+        .includes(searchText.toLowerCase()) ||
+      key
+        .get('description')
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+  );
 
   return (
     <div>
-      <h1 className={classes.secureKeysTitle}>Secure keys</h1>
-      <Divider className={classes.divider} />
+      <div className={classes.secureKeysTitle}>Secure keys</div>
       <div className={classes.secureKeyManager}>
         <div className={classes.addSecureKeyButton}>
           <Button
@@ -135,76 +146,56 @@ const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
           </Button>
         </div>
         <div className={classes.secureKeySearch}>
-          <SecureKeySearch
-            searchText={searchText}
-            handleSearchTextChange={handleSearchTextChange}
-          />
+          <SecureKeySearch searchText={searchText} setSearchText={setSearchText} />
         </div>
       </div>
 
-      <If condition={loading}>
-        <div className={classes.loadingBox}>
-          <LoadingSVGCentered />
-        </div>
-      </If>
-
-      <If condition={!loading}>
-        <Paper>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Key</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Data</TableCell>
-                <TableCell />
-              </TableRow>
-            </TableHead>
-            <TableBody data-cy="secure-key-list">
-              {secureKeys.map((keyMetadata, keyIndex) => {
-                const keyID = keyMetadata.get('name');
-                return (
-                  <TableRow
-                    key={keyMetadata.get('name')}
-                    hover
-                    selected
-                    className={classes.securityKeyRow}
-                    onClick={onSecureKeyClick(keyIndex)}
-                    data-cy={`secure-key-row-${keyMetadata.get('name')}`}
-                  >
-                    <TableCell className={classes.nameCell}>{keyID}</TableCell>
-                    <TableCell className={classes.descriptionCell}>
-                      {keyMetadata.get('description')}
-                    </TableCell>
-                    <TableCell className={classes.dataCell}>
-                      <If condition={!visibility.get(keyID)}>
-                        <input id="password" value="password" disabled type="password"></input>
-                      </If>
-                      <If condition={visibility.get(keyID)}>{keyMetadata.get('data')}</If>
-                    </TableCell>
-                    <TableCell className={classes.actionButtonsCell}>
-                      <SecureKeyActionButtons
-                        keyIndex={keyIndex}
-                        keyID={keyID}
-                        visibility={visibility}
-                        setActiveKeyIndex={setActiveKeyIndex}
-                        setVisibility={setVisibility}
-                        setEditMode={setEditMode}
-                        setDeleteMode={setDeleteMode}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Paper>
-      </If>
+      <Paper className={classes.root}>
+        <Table>
+          <TableHead>
+            <TableRow className={classes.row}>
+              <CustomTableCell>Key</CustomTableCell>
+              <CustomTableCell>Description</CustomTableCell>
+              <CustomTableCell></CustomTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody data-cy="secure-key-list">
+            {filteredSecureKeys.map((keyMetadata, keyIndex) => {
+              const keyID = keyMetadata.get('name');
+              return (
+                <TableRow
+                  key={keyMetadata.get('name')}
+                  hover
+                  selected
+                  className={classes.row}
+                  onClick={() => openEditDialog(keyIndex)}
+                  data-cy={`secure-key-row-${keyMetadata.get('name')}`}
+                >
+                  <CustomTableCell className={classes.nameCell}>{keyID}</CustomTableCell>
+                  <CustomTableCell className={classes.descriptionCell}>
+                    {keyMetadata.get('description')}
+                  </CustomTableCell>
+                  <CustomTableCell className={classes.actionButtonsCell}>
+                    <SecureKeyActionButtons
+                      state={state}
+                      openDeleteDialog={openDeleteDialog}
+                      keyIndex={keyIndex}
+                      keyID={keyID}
+                    />
+                  </CustomTableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Paper>
 
       <SecureKeyCreate
-        setSecureKeyStatus={setSecureKeyStatus}
-        secureKeys={secureKeys}
+        state={state}
         open={createDialogOpen}
         handleClose={() => setCreateDialogOpen(false)}
+        alertSuccess={alertSuccess}
+        alertFailure={alertFailure}
       />
     </div>
   );

@@ -15,7 +15,7 @@
  */
 
 class HydratorPlusPlusNodeConfigCtrl {
-  constructor($scope, $timeout, $state, HydratorPlusPlusPluginConfigFactory, EventPipe, GLOBALS, HydratorPlusPlusConfigActions, myHelpers, NonStorePipelineErrorFactory, $uibModal, HydratorPlusPlusConfigStore, rPlugin, rDisabled, HydratorPlusPlusHydratorService, myPipelineApi, HydratorPlusPlusPreviewStore, rIsStudioMode, HydratorPlusPlusOrderingFactory, avsc, LogViewerStore, DAGPlusPlusNodesActionsFactory, rNodeMetricsContext, HydratorPlusPlusNodeService, HydratorPlusPlusPreviewActions, myAlertOnValium) {
+  constructor($scope, $timeout, $state, HydratorPlusPlusPluginConfigFactory, EventPipe, GLOBALS, HydratorPlusPlusConfigActions, myHelpers, NonStorePipelineErrorFactory, $uibModal, HydratorPlusPlusConfigStore, rPlugin, rDisabled, HydratorPlusPlusHydratorService, myPipelineApi, HydratorPlusPlusPreviewStore, rIsStudioMode, HydratorPlusPlusOrderingFactory, avsc, DAGPlusPlusNodesActionsFactory, rNodeMetricsContext, HydratorPlusPlusNodeService, HydratorPlusPlusPreviewActions, myAlertOnValium) {
     'ngInject';
     this.$scope = $scope;
     this.$timeout = $timeout;
@@ -38,12 +38,12 @@ class HydratorPlusPlusNodeConfigCtrl {
     this.HydratorPlusPlusOrderingFactory = HydratorPlusPlusOrderingFactory;
     this.DAGPlusPlusNodesActionsFactory = DAGPlusPlusNodesActionsFactory;
     this.avsc = avsc;
-    this.LogViewerStore = LogViewerStore;
     this.PipelineMetricsStore = window.CaskCommon.PipelineMetricsStore;
     this.HydratorPlusPlusNodeService = HydratorPlusPlusNodeService;
     this.eventEmitter = window.CaskCommon.ee(window.CaskCommon.ee);
     this.configurationGroupUtilities = window.CaskCommon.ConfigurationGroupUtilities;
     this.dynamicFiltersUtilities = window.CaskCommon.DynamicFiltersUtilities;
+    this.showNewSchemaEditor = window.localStorage['schema-editor'] === 'true';
     this.setDefaults(rPlugin);
     this.myAlertOnValium = myAlertOnValium;
     this.validatePluginProperties = this.validatePluginProperties.bind(this);
@@ -51,6 +51,14 @@ class HydratorPlusPlusNodeConfigCtrl {
     this.previewId = this.getPreviewId();
     this.previewStatus = null;
     this.getStagesAndConnections = this.getStagesAndConnections.bind(this);
+    this.getIsMacroEnabled = this.getIsMacroEnabled.bind(this);
+    this.onImportSchema = this.onImportSchema.bind(this);
+    this.onClearSchema = this.onClearSchema.bind(this);
+    this.onPropagateSchema = this.onPropagateSchema.bind(this);
+    this.onMacroEnabled = this.onMacroEnabled.bind(this);
+    this.onSchemaChange = this.onSchemaChange.bind(this);
+    this.onSchemaImportLinkClick = this.onSchemaImportLinkClick.bind(this);
+    this.isSchemaMacro = this.isSchemaMacro.bind(this);
     this.tabs = [
       {
         label: 'Properties',
@@ -104,7 +112,7 @@ class HydratorPlusPlusNodeConfigCtrl {
     if (rIsStudioMode && this.isPreviewMode && this.previewId) {
       this.previewData = null;
       this.updatePreviewStatus();
-      this.selectedNode = { 
+      this.selectedNode = {
         plugin: this.state.node.plugin,
         isSource: this.state.isSource,
         isSink: this.state.isSink,
@@ -241,7 +249,15 @@ class HydratorPlusPlusNodeConfigCtrl {
             try {
               this.avsc.parse(schemaObj.schema, { wrapUnions: true });
             } catch (e) {
-              this.state.schemaAdvance = true;
+              // If its old schema editor by default set it to advance
+              if (!this.showNewSchemaEditor) {
+                this.state.schemaAdvance = true;
+              } else {
+                // else if its a new schema editor set advance only if the schema is a macro.
+                if (schemaArr.indexOf('${') !== -1) {
+                  this.state.schemaAdvance = true;
+                }
+              }
             }
           }
         });
@@ -249,7 +265,15 @@ class HydratorPlusPlusNodeConfigCtrl {
         try {
           this.avsc.parse(schemaArr, { wrapUnions: true });
         } catch (e) {
-          this.state.schemaAdvance = true;
+          // If its old schema editor by default set it to advance
+          if (!this.showNewSchemaEditor) {
+            this.state.schemaAdvance = true;
+          } else {
+            // else if its a new schema editor set advance only if the schema is a macro.
+            if (schemaArr.indexOf('${') !== -1) {
+              this.state.schemaAdvance = true;
+            }
+          }
         }
       }
     }
@@ -408,14 +432,22 @@ class HydratorPlusPlusNodeConfigCtrl {
 
     reader.onload = (evt) => {
       let data = evt.target.result;
-      this.EventPipe.emit('schema.import', data);
+      if (this.showNewSchemaEditor) {
+        this.eventEmitter.emit('schema.import', data);
+      } else {
+        this.EventPipe.emit('schema.import', data);
+      }
     };
   }
   onSchemaImportLinkClick() {
     this.$timeout(() => document.getElementById('schema-import-link').click());
   }
   exportSchema() {
-    this.EventPipe.emit('schema.export');
+    if (this.showNewSchemaEditor) {
+      this.eventEmitter.emit('schema.export');
+    } else {
+      this.EventPipe.emit('schema.export');
+    }
   }
 
   validateSchema() {
@@ -488,6 +520,19 @@ class HydratorPlusPlusNodeConfigCtrl {
     this.HydratorPlusPlusPluginConfigFactory.validatePluginProperties(nodeInfo, this.state.config, errorCb);
   }
 
+  // MACRO ENABLED SCHEMA
+  toggleAdvance() {
+    if (this.state.node.outputSchema.length > 0) {
+      try {
+        this.avsc.parse(this.state.node.outputSchema[0].schema, { wrapUnions: true });
+      } catch (e) {
+        this.state.node.outputSchema = [this.HydratorPlusPlusNodeService.getOutputSchemaObj('')];
+      }
+    }
+
+    this.state.schemaAdvance = !this.state.schemaAdvance;
+  }
+
   hasUniqueFields(schema, error) {
     if (!schema) { return true; }
 
@@ -531,10 +576,9 @@ class HydratorPlusPlusNodeConfigCtrl {
   }
 
   updatePreviewStatus() {
-    const logViewerState = this.LogViewerStore.getState();
-    // TODO: Move preview status state info HydratorPlusPlusPreviewStore, then get from there
-    if (logViewerState.statusInfo) {
-      this.previewStatus = logViewerState.statusInfo.status;
+    const previewState = this.previewStore.getState().preview;
+    if (previewState.status) {
+      this.previewStatus = previewState.status;
     }
   }
 
@@ -544,19 +588,6 @@ class HydratorPlusPlusNodeConfigCtrl {
 
   getStagesAndConnections() {
     return this.ConfigStore.getConfigForExport().config;
-  }
-
-  // MACRO ENABLED SCHEMA
-  toggleAdvance() {
-    if (this.state.node.outputSchema.length > 0) {
-      try {
-        this.avsc.parse(this.state.node.outputSchema[0].schema, { wrapUnions: true });
-      } catch (e) {
-        this.state.node.outputSchema = [this.HydratorPlusPlusNodeService.getOutputSchemaObj('')];
-      }
-    }
-
-    this.state.schemaAdvance = !this.state.schemaAdvance;
   }
 
   // TOOLTIPS FOR DISABLED SCHEMA ACTIONS
@@ -585,6 +616,97 @@ class HydratorPlusPlusNodeConfigCtrl {
       return 'Clearing a schema in Advanced mode is not supported';
     }
     return '';
+  }
+  getIsMacroEnabled() {
+    return (
+      !this.$scope.isDisabled &&
+      this.state.node._backendProperties['schema'] &&
+      this.state.node._backendProperties['schema'].macroSupported
+    );
+  }
+  onClearSchema() {
+    this.$timeout(() => this.state.node['outputSchema'] = [{ name: 'etlSchemaBody', schema: ''}]);
+  }
+  onPropagateSchema() {
+    this.$timeout(() => this.showPropagateConfirm = true);
+  }
+  onMacroEnabled() {
+    this.$timeout(() => this.state.schemaAdvance = !this.state.schemaAdvance);
+  }
+  onSchemaChange(outputSchemas) {
+    this.$timeout(() => this.state.node.outputSchema = outputSchemas);
+  }
+  onImportSchema(stringifiedSchema) {
+    try {
+      this.state.node.outputSchema = JSON.parse(stringifiedSchema);
+      if (!Array.isArray(this.state.node.outputSchema)) {
+        this.$timeout(() => this.state.node.outputSchema = [this.state.node.outputSchema]);
+      }
+    } catch(e) {
+      this.$timeout(() => this.state.node.outputSchema = [{ name: 'etlSchemaBody', schema: ''}]);
+    }
+  }
+  isSchemaMacro() {
+    return this.state.schemaAdvance;
+  }
+  getActionsDropdownMap(isInputSchema) {
+    let actionsMap = {};
+    if (isInputSchema) {
+      return {};
+    }
+    if (this.$scope.isDisabled) {
+      return {
+        export: {
+          value: 'export',
+          label: 'Export',
+          disabled: this.state.schemaAdvance,
+          tooltip: this.state.schemaAdvance ? 'Exporting a schema in Advanced mode is not supported' : '',
+          onClick: this.exportSchema.bind(this),
+        }
+      };
+    }
+    if (this.getIsMacroEnabled()) {
+      actionsMap['macro'] = {
+        value: 'macro',
+        label: this.state.schemaAdvance ? 'Editor' : 'Macro',
+        disabled: this.datasetAlreadyExists,
+        tooltip: this.datasetAlreadyExists ? `The dataset '${this.datasetId}' already exists. Its schema cannot be modified.` : '',
+        onClick: this.onMacroEnabled.bind(this),
+      };
+    }
+    actionsMap = Object.assign({}, actionsMap, {
+      import: {
+        value: 'import',
+        label: 'Import',
+        disabled: this.datasetAlreadyExists || this.state.schemaAdvance,
+        tooltip: this.getImportDisabledTooltip(),
+        onClick: this.onSchemaImportLinkClick.bind(this),
+      },
+      export: {
+        value: 'export',
+        label: 'Export',
+        disabled: this.state.schemaAdvance,
+        tooltip: this.state.schemaAdvance ? 'Exporting a schema in Advanced mode is not supported' : '',
+        onClick: this.exportSchema.bind(this),
+      },
+      propagate: {
+        value: 'propagate',
+        label: 'Propagate',
+        disabled:
+          this.state.schemaAdvance ||
+          this.state.node.type === 'splittertransform',
+        tooltip: this.getPropagateDisabledTooltip(),
+        onClick: this.onPropagateSchema.bind(this),
+      },
+      clear: {
+        value: 'clear',
+        label: 'Clear',
+        disabled: this.datasetAlreadyExists || this.state.schemaAdvance,
+        tooltip: this.getClearDisabledTooltip(),
+        onClick: this.onClearSchema.bind(this),
+      },
+    });
+    return actionsMap;
   }
 }
 
