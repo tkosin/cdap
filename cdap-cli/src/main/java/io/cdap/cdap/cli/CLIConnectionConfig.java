@@ -16,6 +16,7 @@
 
 package io.cdap.cdap.cli;
 
+import com.google.common.base.Objects;
 import io.cdap.cdap.client.config.ConnectionConfig;
 import io.cdap.cdap.proto.id.NamespaceId;
 
@@ -42,8 +43,13 @@ public class CLIConnectionConfig extends ConnectionConfig {
     this.namespace = namespace;
   }
 
-  public CLIConnectionConfig(NamespaceId namespace, String hostname, int port, boolean sslEnabled) {
-    super(hostname, port, sslEnabled);
+  public CLIConnectionConfig(NamespaceId namespace, String hostname, Integer port, boolean sslEnabled) {
+    this(namespace, hostname, port, sslEnabled, null);
+  }
+
+  public CLIConnectionConfig(NamespaceId namespace, String hostname, Integer port, boolean sslEnabled,
+                             @Nullable String apiPath) {
+    super(hostname, port, sslEnabled, apiPath);
     this.namespace = namespace;
     this.username = null;
   }
@@ -58,8 +64,28 @@ public class CLIConnectionConfig extends ConnectionConfig {
 
   @Override
   public URI getURI() {
-    return URI.create(String.format("%s://%s%s:%d/%s", super.isSSLEnabled() ? "https" : "http",
-                                    username == null ? "" : username + "@",
-                                    super.getHostname(), super.getPort(), namespace.getNamespace()));
+    return URI.create(String.format("%s://%s%s/%s%s", super.isSSLEnabled() ? "https" : "http",
+                                    (username == null || username.isEmpty()) ? "" : username + "@",
+                                    getFullHost(), getApiPath() == null ? "" : getApiPath(),
+                                    namespace.getNamespace()));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    CLIConnectionConfig other = (CLIConnectionConfig) obj;
+    return Objects.equal(this.namespace, other.namespace)
+      && Objects.equal(this.username, other.username)
+      && super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(super.hashCode(), namespace, username);
   }
 }
