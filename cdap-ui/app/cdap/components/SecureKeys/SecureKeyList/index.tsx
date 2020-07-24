@@ -62,6 +62,9 @@ const styles = (theme): StyleRules => {
     addSecureKeyButton: {
       gridRow: '1',
       gridColumnStart: '1',
+      textTransform: 'none',
+      padding: '7px',
+      fontSize: '13px',
     },
     secureKeySearch: {
       gridRow: '1',
@@ -134,17 +137,15 @@ const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
     <div>
       <div className={classes.secureKeysTitle}>Secure keys</div>
       <div className={classes.secureKeyManager}>
-        <div className={classes.addSecureKeyButton}>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            onClick={() => setCreateDialogOpen(true)}
-            data-cy="create-secure-key"
-          >
-            Create Secure Key
-          </Button>
-        </div>
+        <Button
+          className={classes.addSecureKeyButton}
+          color="primary"
+          variant="contained"
+          onClick={() => setCreateDialogOpen(true)}
+          data-cy="create-secure-key"
+        >
+          Create secure key
+        </Button>
         <div className={classes.secureKeySearch}>
           <SecureKeySearch searchText={searchText} setSearchText={setSearchText} />
         </div>

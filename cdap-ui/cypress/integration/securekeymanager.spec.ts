@@ -65,10 +65,9 @@ describe('Secure Key Manager Page', () => {
   describe('Accessing and managing secure keys', () => {
     before(() => {
       cy.visit('/cdap/ns/default/securekeys');
-      cy.wait(6000); // wait for secure keys to be loaded
-    });
+      cy.wait(2000); // wait for secure keys to be loaded
 
-    it('should delete MOCK_SECURE_KEYS before testing if they already exist in the secure storage', () => {
+      // Delete MOCK_SECURE_KEYS before testing if they already exist in the secure storage
       cy.get('body').then((body) => {
         MOCK_SECURE_KEYS.forEach((key) => {
           const secureKeyMenu = `${dataCy(`secure-key-row-${key.name}`)} ${dataCy(`menu-icon`)}`;
