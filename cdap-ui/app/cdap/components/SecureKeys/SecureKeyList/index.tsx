@@ -144,7 +144,7 @@ const SecureKeyListView: React.FC<ISecureKeyListProps> = ({
           onClick={() => setCreateDialogOpen(true)}
           data-cy="create-secure-key"
         >
-          Create secure key
+          Add secure key
         </Button>
         <div className={classes.secureKeySearch}>
           <SecureKeySearch searchText={searchText} setSearchText={setSearchText} />

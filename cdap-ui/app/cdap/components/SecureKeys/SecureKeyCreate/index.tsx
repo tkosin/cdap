@@ -192,7 +192,7 @@ const SecureKeyCreateView: React.FC<ISecureKeyCreateProps> = ({
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleClose} color="primary" data-cy="cancel">
           Cancel
         </Button>
         <Button

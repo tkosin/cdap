@@ -203,6 +203,15 @@ declare global {
        */
       assert_runtime_args_row: (row: number, key: string, value: string, macro?: boolean) => void;
       compareSnapshot: (s: string) => any;
+
+      /**
+       * Cleans up secure keys after executing the tests. This is to remove state
+       *  from individual tests.
+       *
+       * @headers - Any request headers to be passed.
+       * @secureKeyName - name of the secure key to be deleted.
+      */
+      cleanup_secure_key: (headers: any, secureKeyName: string) => Chainable<Request>;
     }
     // tslint:disable-next-line: interface-name
     interface Window {

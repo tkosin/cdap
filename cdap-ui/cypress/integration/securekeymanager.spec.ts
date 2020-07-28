@@ -53,36 +53,15 @@ describe('Secure Key Manager Page', () => {
         };
       });
     });
-    const stub = cy.stub();
-    cy.window().then((win) => {
-      win.onbeforeunload = null;
-    });
-    cy.on('window:confirm', stub);
 
-    Helpers.getArtifactsPoll(headers);
+    // Delete secure keys to clean up
+    MOCK_SECURE_KEYS.forEach((securekey) => cy.cleanup_secure_key(headers, securekey.name));
   });
 
   describe('Accessing and managing secure keys', () => {
     before(() => {
       cy.visit('/cdap/ns/default/securekeys');
       cy.wait(2000); // wait for secure keys to be loaded
-
-      // Delete MOCK_SECURE_KEYS before testing if they already exist in the secure storage
-      cy.get('body').then((body) => {
-        MOCK_SECURE_KEYS.forEach((key) => {
-          const secureKeyMenu = `${dataCy(`secure-key-row-${key.name}`)} ${dataCy(`menu-icon`)}`;
-          if (body.find(secureKeyMenu).length > 0) {
-            cy.get(secureKeyMenu).click();
-
-            // open a delete dialog
-            cy.get(dataCy('delete-secure-key')).click();
-
-            // confirm delete
-            cy.get(dataCy('Delete')).click();
-            cy.wait(6000); // wait for success alert component to disappear
-          }
-        });
-      });
     });
 
     it('should add secure keys', () => {
@@ -104,23 +83,45 @@ describe('Secure Key Manager Page', () => {
       });
     });
 
+    it('should raise error when adding duplicate key name', () => {
+      const keyToAdd = MOCK_SECURE_KEYS[0];
+      cy.get(dataCy('create-secure-key')).click({ force: true });
+
+      cy.get(dataCy('secure-key-name'))
+        .click()
+        .type(keyToAdd.name);
+      cy.get(dataCy('secure-key-description'))
+        .click()
+        .type('random description');
+      cy.get(dataCy('secure-key-data'))
+        .click()
+        .type('random data');
+
+      cy.get(dataCy('save-secure-key')).click();
+
+      cy.get(dataCy('cancel')).click();
+
+      cy.contains('Error: Duplicate key name');
+      cy.wait(6000); // wait for failure alert component to disappear
+    });
+
     it('should edit a secure key', () => {
       const keyToEdit = MOCK_SECURE_KEYS[0];
-      const additionalLetter = '1';
+      const newDescription = '1';
 
       // Click on a table row of the first secure key
       // This will open a edit dialog
       cy.get(dataCy(`secure-key-row-${keyToEdit.name}`)).click();
 
       // edit the description of secure key
+      cy.get(`${dataCy('secure-key-description')} input`).clear();
       cy.get(dataCy('secure-key-description'))
         .click()
-        .type(additionalLetter);
+        .type(newDescription);
 
-      // edit the data of secure key
       cy.get(dataCy('secure-key-data'))
         .click()
-        .type(additionalLetter);
+        .type('random data');
 
       cy.get(dataCy('save-secure-key')).click();
       cy.wait(6000); // wait for success alert component to disappear
@@ -132,7 +133,7 @@ describe('Secure Key Manager Page', () => {
       cy.get(`${dataCy('secure-key-description')} input`)
         .invoke('val')
         .then((val) => {
-          expect(val).equals(keyToEdit.description + additionalLetter); // since we typed '1'
+          expect(val).equals(newDescription);
         });
 
       cy.get(dataCy('close-edit-dialog')).click();
