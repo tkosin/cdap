@@ -1682,7 +1682,6 @@ angular.module(PKG.name + '.commons')
       vm.pluginsMap = AvailablePluginsStore.getState().plugins.pluginsMap;
       if (!_.isEmpty(vm.pluginsMap)) {
         addErrorAlertsEndpointsAndConnections();
-        subAvailablePlugins();
       }
     });
 
