@@ -18,6 +18,9 @@ package io.cdap.cdap.etl.api;
 
 import io.cdap.cdap.api.annotation.Beta;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Provides join keys on which join needs to be performed and merges the join results.
  *
@@ -36,7 +39,20 @@ public interface Joiner<JOIN_KEY, INPUT_RECORD, OUT> {
    * @return returns join key
    * @throws Exception if there is some error getting the join key
    */
+  @Deprecated
   JOIN_KEY joinOn(String stageName, INPUT_RECORD inputRecord) throws Exception;
+
+  /**
+   * Return value for the join keys on which join will be performed
+   *
+   * @param stageName name of the stage to which records belongs to
+   * @param inputRecord input record to be joined
+   * @return returns a list of join keys
+   * @throws Exception if there is some error getting the join key
+   */
+  default Collection<JOIN_KEY> getJoinKeys(String stageName, INPUT_RECORD inputRecord) throws Exception{
+    return Collections.singletonList(joinOn(stageName, inputRecord));
+  };
 
   /**
    * Creates join configuration which holds information about required inputs which are needed to decide
